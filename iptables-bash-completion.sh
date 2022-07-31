@@ -3,18 +3,15 @@ _iptables_options()
     if [[ $LOPT = @(-m|--match|-p|--protocol) ]]; then
         case $LVAL in
             all|0) WORDS+=" --source-port --sport --destination-port --dport
-                --tcp-flags --syn --tcp-option --chunk-types --espspi"
+                --tcp-flags --syn --tcp-option --chunk-types --espspi --ahspi"
                 if [[ $CMD = ip6tables ]]; then
-	                WORDS+=" --ahspi --ahlen --ahres --icmpv6-type --mh-type"
+	                WORDS+=" --ahlen --ahres --icmpv6-type --mh-type"
                 else
-	                WORDS+=" --ahspi --icmp-type"
+	                WORDS+=" --icmp-type"
                 fi ;;
             addrtype) WORDS+=" --src-type --dst-type --limit-iface-in --limit-iface-out" ;;
-            ah) if [[ $CMD = ip6tables ]]; then
-                    WORDS+=" --ahspi --ahlen --ahres"
-                else
-                    WORDS+=" --ahspi"
-                fi ;;
+            ah) WORDS+=" --ahspi"
+                [[ $CMD = ip6tables ]] && WORDS+=" --ahlen --ahres" ;;
             bpf) WORDS+=" --object-pinned --bytecode" ;;
             cgroup) WORDS+=" --path --cgroup" ;;
             cluster) WORDS+=" --cluster-total-nodes --cluster-local-node 
