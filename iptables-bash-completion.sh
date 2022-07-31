@@ -279,7 +279,7 @@ _iptables_check()
 _iptables() 
 {
     if ! [[ $PROMPT_COMMAND =~ "COMP_WORDBREAKS=" ]]; then
-        PROMPT_COMMAND="COMP_WORDBREAKS=$' \t\n\"'\''@><=;|&(:'; "$PROMPT_COMMAND
+        PROMPT_COMMAND="COMP_WORDBREAKS=${COMP_WORDBREAKS@Q}; "$PROMPT_COMMAND
     fi
     if ! [[ $COMP_WORDBREAKS =~ "," ]]; then COMP_WORDBREAKS+=","; fi
 
