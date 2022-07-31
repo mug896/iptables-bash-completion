@@ -37,7 +37,8 @@ _iptables_options()
             hbh) WORDS+=" --hbh-len --hbh-opts" ;;
             helper) WORDS+=" --helper" ;;
             hl) WORDS+=" --hl-eq --hl-lt --hl-gt" ;;
-            icmp|icmp6) WORDS+=" --icmp-type --icmpv6-type" ;;
+            icmp) WORDS+=" --icmp-type" ;;
+            icmp6) WORDS+=" --icmpv6-type" ;;
             iprange) WORDS+=" --src-range --dst-range" ;;
             ipv6header) WORDS+=" --soft --header" ;;
             ipvs) WORDS+=" --ipvs --vproto --vaddr --vport --vdir --vmethod --vportctl" ;; 
@@ -297,7 +298,9 @@ _iptables()
         WORDS=$( \ls /sys/class/net/ )
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*p|--protocol)$ && ${CUR:0:1} != "-" ]]; then
-        WORDS="tcp udp udplite icmp icmpv6 esp ah sctp mh all"
+        WORDS="tcp udp udplite esp ah sctp all"
+        [[ $CMD = iptables ]] && WORDS+=" icmp"
+        [[ $CMD = ip6tables ]] && WORDS+=" icmpv6 mh"
     
     elif [[ $PREV2 =~ ^(-[[:alnum:]]*P|--policy)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP"
