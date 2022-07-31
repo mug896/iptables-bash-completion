@@ -239,12 +239,12 @@ _iptables_arguments()
 
         elif [[ $LVAL = REJECT && $PREV = --reject-with ]]; then
             if [[ $CMD = ip6tables ]]; then
-            WORDS="icmp6-no-route no-route icmp6-adm-prohibited 
+            WORDS="icmp6-no-route no-route icmp6-adm-prohibited tcp-reset
                 adm-prohibited icmp6-addr-unreachable addr-unreach icmp6-port-unreachable"
             else
             WORDS="icmp-net-unreachable icmp-host-unreachable icmp-port-unreachable
                 icmp-proto-unreachable icmp-net-prohibited icmp-host-prohibited 
-                icmp-admin-prohibited"
+                icmp-admin-prohibited tcp-reset"
             fi
 
         elif [[ $LVAL = TCPOPTSTRIP && $LPRE = --strip-options ]]; then
