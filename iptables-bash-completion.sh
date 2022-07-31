@@ -2,10 +2,10 @@ _iptables_options()
 {
     if [[ $LOPT = @(-m|--match|-p|--protocol) ]]; then
         case $LVAL in
-            all) WORDS+=" --source-port --sport --destination-port --dport --tcp-flags 
-                --syn --tcp-option --chunk-types --mh-type --espspi"
+            all|0) WORDS+=" --source-port --sport --destination-port --dport
+                --tcp-flags --syn --tcp-option --chunk-types --espspi"
                 if [[ $CMD = ip6tables ]]; then
-	                WORDS+=" --ahspi --ahlen --ahres --icmpv6-type"
+	                WORDS+=" --ahspi --ahlen --ahres --icmpv6-type --mh-type"
                 else
 	                WORDS+=" --ahspi --icmp-type"
                 fi ;;
@@ -162,13 +162,13 @@ _iptables_arguments()
             WORDS="srcip srcport dstip dstport"
             [[ $CUR = "," ]] && CUR=""
         
-        elif [[ $LVAL = @(icmp|all) && $PREV = --icmp-type ]]; then
+        elif [[ $LVAL = @(icmp|all|0) && $PREV = --icmp-type ]]; then
             WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
-        elif [[ $LVAL = @(icmp6|all) && $PREV = --icmpv6-type ]]; then
+        elif [[ $LVAL = @(icmp6|all|0) && $PREV = --icmpv6-type ]]; then
             WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid ICMPv6 Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
         
-        elif [[ $LVAL = @(mh|all) && $PREV = --mh-type ]]; then
+        elif [[ $LVAL = @(mh|all|0) && $PREV = --mh-type ]]; then
             WORDS=$(sudo $CMD -p mh -h | sed -En '/^Valid MH Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
         elif [[ $LVAL = ipv6header && $LPRE = --header ]]; then
@@ -192,11 +192,11 @@ _iptables_arguments()
                 --mode) WORDS="tunnel transport" ;;
             esac
 
-        elif [[ $LVAL = @(tcp|all) && $LPRE = --tcp-flags ]]; then
+        elif [[ $LVAL = @(tcp|all|0) && $LPRE = --tcp-flags ]]; then
             WORDS="SYN ACK FIN RST URG PSH ALL NONE"
             [[ $CUR = "," ]] && CUR=""
 
-        elif [[ $LVAL = @(sctp|all) ]]; then
+        elif [[ $LVAL = @(sctp|all|0) ]]; then
             if [[ $PREV = --chunk-types ]]; then
                 WORDS="all any only"
             elif [[ $PREV = DATA && $CUR = ":" ]]; then
@@ -345,8 +345,8 @@ _iptables()
 
     else
         [[ ${COMP_LINE% *} =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+) ]]
-        local LOPT=${BASH_REMATCH[1]}
-        local LVAL=${BASH_REMATCH[2]}
+        local LOPT=${BASH_REMATCH[1]:--p}
+        local LVAL=${BASH_REMATCH[2]:-all}
         [[ ${COMP_LINE% *} =~ .*" "(--[[:alnum:]-]+) ]]
         local LPRE=${BASH_REMATCH[1]}
 
