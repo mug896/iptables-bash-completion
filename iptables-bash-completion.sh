@@ -155,6 +155,12 @@ _iptables_arguments()
             WORDS="srcip srcport dstip dstport"
             [[ $CUR = "," ]] && CUR=""
         
+        elif [[ $LVAL = icmp && $PREV = --icmp-type ]]; then
+            WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid/,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+
+        elif [[ $LVAL = icmp6 && $PREV = --icmpv6-type ]]; then
+            WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid/,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+
         elif [[ $LVAL = ipv6header && $LPRE = --header ]]; then
             WORDS="hop hop-by-hop dst route frag auth esp none prot"
             [[ $CUR = "," ]] && CUR=""
@@ -291,7 +297,7 @@ _iptables()
 --rename-chain|-[[:alnum:]]*g|--goto)$
         || $PREV2 =~ ^(-[[:alnum:]]*E|--rename-chain)$) && ${CUR:0:1} != "-" ]]; then
         WORDS="INPUT OUTPUT FORWARD PREROUTING POSTROUTING"
-        WORDS+=" "$( sudo iptables -S | awk '{print $2}' )
+        WORDS+=" "$( sudo $CMD -S | awk '{print $2}' )
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*i|--in-interface|-[[:alnum:]]*o|--out-interface|\
 --rateest1|--rateest2|--rateest-name)$ && ${CUR:0:1} != "-" ]]; then
@@ -300,14 +306,14 @@ _iptables()
     elif [[ $PREV =~ ^(-[[:alnum:]]*p|--protocol)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="tcp udp udplite esp ah sctp all"
         [[ $CMD = iptables ]] && WORDS+=" icmp"
-        [[ $CMD = ip6tables ]] && WORDS+=" icmpv6 mh"
+        [[ $CMD = ip6tables ]] && WORDS+=" icmp6 mh"
     
     elif [[ $PREV2 =~ ^(-[[:alnum:]]*P|--policy)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP"
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*j|--jump)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP RETURN"
-        WORDS+=" "$( sudo iptables -S | awk '{print $2}' )
+        WORDS+=" "$( sudo $CMD -S | awk '{print $2}' )
         WORDS+=" AUDIT CHECKSUM CLASSIFY CONNMARK CONNSECMARK CT DNAT DSCP HMARK 
         IDLETIMER LED LOG MARK MASQUERADE NETMAP NFLOG NFQUEUE NOTRACK RATEEST 
         REDIRECT REJECT SECMARK SET SNAT SYNPROXY TCPMSS TCPOPTSTRIP TEE TOS TPROXY TRACE"
