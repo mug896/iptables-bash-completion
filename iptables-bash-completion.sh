@@ -265,7 +265,8 @@ _iptables_check()
     local arg1 arg2
     for arg1 in "$@"; do
         for arg2 in "${COMP_WORDS[@]}"; do
-            if [[ ${arg1:0:2} = "--" ]]; then 
+            [[ $arg2 = $CMD ]] && continue
+            if [[ ${arg2:0:2} = "--" ]]; then 
                 [[ $arg2 = $arg1 ]] && return
             else
                 [[ $arg2 =~ ${arg1:1} ]] && return
