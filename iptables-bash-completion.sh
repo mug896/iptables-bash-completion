@@ -156,10 +156,10 @@ _iptables_arguments()
             [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL = icmp && $PREV = --icmp-type ]]; then
-            WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid/,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+            WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
         elif [[ $LVAL = icmp6 && $PREV = --icmpv6-type ]]; then
-            WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid/,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+            WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid ICMPv6 Types:/,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
         elif [[ $LVAL = ipv6header && $LPRE = --header ]]; then
             WORDS="hop hop-by-hop dst route frag auth esp none prot"
