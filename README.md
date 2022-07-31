@@ -10,14 +10,18 @@ iptables v1.8.7 (nf_tables): no command specified
 Try `iptables -h' or 'iptables --help' for more information.
 
 bash$ iptables -[tab]
---append         --list-rules     --wait           -L               -n
---check          --modprobe=      --wait-interval  -N               -t
---delete         --new-chain      --zero           -P               -v
---delete-chain   --numeric        -A               -R               -w
---exact          --policy         -C               -S               -x
---flush          --rename-chain   -D               -W               
---insert         --replace        -E               -X               
---line-numbers   --table          -F               -Z               
---list           --verbose        -I               -h 
+--ahspi             --line-numbers      --tcp-option        -P
+--append            --list              --verbose           -R
+--check             --list-rules        --wait              -S
+--chunk-types       --modprobe=         --wait-interval     -W
+--delete            --new-chain         --zero              -X
+--delete-chain      --numeric           -A                  -Z
+--destination-port  --policy            -C                  -h
+--dport             --rename-chain      -D                  -n
+--espspi            --replace           -E                  -v
+--exact             --source-port       -F                  -w
+--flush             --sport             -I                  -x
+--icmp-type         --syn               -L                  
+--insert            --tcp-flags         -N
 ```
 
