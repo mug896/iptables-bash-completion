@@ -193,6 +193,9 @@ _iptables_arguments()
             WORDS="INVALID ESTABLISHED NEW RELATED UNTRACKED"
             [[ $CUR = "," ]] && CUR=""
 
+        elif [[ $LVAL = statistic && $PREV = --mode ]]; then
+            WORDS="random nth"
+
         elif [[ $LVAL = string && $PREV = --algo ]]; then
             WORDS="bm kmp"
         
