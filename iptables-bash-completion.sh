@@ -213,7 +213,6 @@ _iptables_arguments()
         elif [[ $LVAL = time && $LPRE = --weekdays ]]; then
             WORDS="Mon Tue Wed Thu Fri Sat Sun"
             [[ $CUR = "," ]] && CUR=""
-
         fi
         
     elif [[ $LOPT = @(-j|--jump) ]]; then
@@ -284,7 +283,8 @@ _iptables()
         WORDS="INPUT OUTPUT FORWARD PREROUTING POSTROUTING"
         WORDS+=" "$( sudo iptables -S | awk '{print $2}' )
 
-    elif [[ $PREV = @(-i|--in-interface|-o|--out-interface|--rateest1|--rateest2|--rateest-name) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV = @(-i|--in-interface|-o|--out-interface|--rateest1|--rateest2|--rateest-name) \
+        && ${CUR:0:1} != "-" ]]; then
         WORDS=$( \ls /sys/class/net/ )
 
     elif [[ $PREV = @(-p|--protocol) && ${CUR:0:1} != "-" ]]; then
