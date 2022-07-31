@@ -265,10 +265,11 @@ _iptables_check()
     local arg1 arg2
     for arg1 in "$@"; do
         for arg2 in "${COMP_WORDS[@]}"; do
-            [[ $arg2 = $CMD ]] && continue
+            [[ ${arg2:0:1} != "-" ]] && continue
             if [[ ${arg2:0:2} = "--" ]]; then 
                 [[ $arg2 = $arg1 ]] && return
             else
+                [[ ${arg1:0:2} = "--" ]] && continue
                 [[ $arg2 =~ ${arg1:1} ]] && return
             fi
         done
