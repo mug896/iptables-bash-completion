@@ -1,13 +1,3 @@
-_iptables_check() 
-{
-    local arg1 arg2
-    for arg1 in "$@"; do
-        for arg2 in "${COMP_WORDS[@]}"; do
-            [[ $arg1 = $arg2 ]] && return
-        done
-    done        
-    echo "$@"
-}
 _iptables_options()
 {
     if [[ $LOPT = @(-m|--match|-p|--protocol) ]]; then
@@ -246,6 +236,20 @@ _iptables_arguments()
         fi
     fi
 }
+_iptables_check() 
+{
+    local arg1 arg2
+    for arg1 in "$@"; do
+        for arg2 in "${COMP_WORDS[@]}"; do
+            if [[ ${arg1:0:2} = "--" ]]; then 
+                [[ $arg2 = $arg1 ]] && return
+            else
+                [[ $arg2 =~ ${arg1:1} ]] && return
+            fi
+        done
+    done        
+    echo "$@"
+}
 _iptables() 
 {
     if ! [[ $PROMPT_COMMAND =~ "COMP_WORDBREAKS=" ]]; then
@@ -273,27 +277,29 @@ _iptables()
         --line-numbers --modprobe="
     fi
 
-    if [[ $PREV = @(-t|--table) && ${CUR:0:1} != "-" ]]; then
+    if [[ $PREV =~ ^(-[[:alnum:]]*t|--table)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="filter nat mangle raw security"
 
-    elif [[ ($PREV = @(-A|--append|-C|--check|-D|--delete|-I|--insert|-R|--replace|\
--L|--list|-S|--list-rules|-F|--flush|-Z|--zero|-N|--new-chain|-X|--delete-chain|\
--P|--policy|-E|--rename-chain|-g|--goto) 
-        || $PREV2 = @(-E|--rename-chain)) && ${CUR:0:1} != "-" ]]; then
+    elif [[ ($PREV =~ ^(-[[:alnum:]]*A|--append|-[[:alnum:]]*C|--check|-[[:alnum:]]*D|\
+--delete|-[[:alnum:]]*I|--insert|-[[:alnum:]]*R|--replace|-[[:alnum:]]*L|--list|\
+-[[:alnum:]]*S|--list-rules|-[[:alnum:]]*F|--flush|-[[:alnum:]]*Z|--zero|-[[:alnum:]]*N|\
+--new-chain|-[[:alnum:]]*X|--delete-chain|-[[:alnum:]]*P|--policy|-[[:alnum:]]*E|\
+--rename-chain|-[[:alnum:]]*g|--goto)$
+        || $PREV2 =~ ^(-[[:alnum:]]*E|--rename-chain)$) && ${CUR:0:1} != "-" ]]; then
         WORDS="INPUT OUTPUT FORWARD PREROUTING POSTROUTING"
         WORDS+=" "$( sudo iptables -S | awk '{print $2}' )
 
-    elif [[ $PREV = @(-i|--in-interface|-o|--out-interface|--rateest1|--rateest2|--rateest-name) \
-        && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV =~ ^(-[[:alnum:]]*i|--in-interface|-[[:alnum:]]*o|--out-interface|\
+--rateest1|--rateest2|--rateest-name)$ && ${CUR:0:1} != "-" ]]; then
         WORDS=$( \ls /sys/class/net/ )
 
-    elif [[ $PREV = @(-p|--protocol) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV =~ ^(-[[:alnum:]]*p|--protocol)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="tcp udp udplite icmp icmpv6 esp ah sctp mh all"
     
-    elif [[ $PREV2 = @(-P|--policy) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV2 =~ ^(-[[:alnum:]]*P|--policy)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP"
 
-    elif [[ $PREV = @(-j|--jump) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV =~ ^(-[[:alnum:]]*j|--jump)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP RETURN"
         WORDS+=" "$( sudo iptables -S | awk '{print $2}' )
         WORDS+=" AUDIT CHECKSUM CLASSIFY CONNMARK CONNSECMARK CT DNAT DSCP HMARK 
@@ -302,7 +308,7 @@ _iptables()
         [[ $CMD = iptables ]] && WORDS+=" CLUSTERIP ECN TTL ULOG"
         [[ $CMD = ip6tables ]] && WORDS+=" DNPT HL SNPT"
 
-    elif [[ $PREV = @(-m|--match) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV =~ ^(-[[:alnum:]]*m|--match)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="addrtype ah bpf cgroup cluster comment connbytes connlabel connlimit
         connmark conntrack cpu dccp devgroup dscp ecn esp hashlimit helper iprange
         ipvs length limit mac mark multiport nfacct osf owner physdev pkttype policy 
