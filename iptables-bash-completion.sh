@@ -292,9 +292,10 @@ _iptables()
         -I --insert -R --replace -L --list -S --list-rules -F --flush -Z --zero \
         -N --new-chain -X --delete-chain -P --policy -E --rename-chain )
         if [[ ${WORDS%%+( )} = "" || ${WORDS%%+( )} = "-t --table" ]]; then
-        WORDS+=" -4 --ipv4 -6 --ipv6 -p --protocol -s --source -d --destination 
-        -m --match -j --jump -g --goto -i --in-interface -o --out-interface
-        -f --fragment -c --set-counters"
+            WORDS+=" -4 --ipv4 -6 --ipv6 -p --protocol -s --source -d --destination 
+            -m --match -j --jump -g --goto -i --in-interface -o --out-interface 
+            -c --set-counters"
+            [[ $CMD = iptables ]] && WORDS+=" -f --fragment"
         fi
         WORDS+=" -h -v --verbose -w --wait -W --wait-interval -n --numeric -x --exact 
         --line-numbers --modprobe="
