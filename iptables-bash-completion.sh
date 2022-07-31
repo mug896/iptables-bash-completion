@@ -2,6 +2,13 @@ _iptables_options()
 {
     if [[ $LOPT = @(-m|--match|-p|--protocol) ]]; then
         case $LVAL in
+            all) WORDS+=" --source-port --sport --destination-port --dport --tcp-flags 
+                --syn --tcp-option --chunk-types --mh-type --espspi"
+                if [[ $CMD = ip6tables ]]; then
+	                WORDS+=" --ahspi --ahlen --ahres --icmpv6-type"
+                else
+	                WORDS+=" --ahspi --icmp-type"
+                fi ;;
             addrtype) WORDS+=" --src-type --dst-type --limit-iface-in --limit-iface-out" ;;
             ah) if [[ $CMD = ip6tables ]]; then
                     WORDS+=" --ahspi --ahlen --ahres"
@@ -155,13 +162,13 @@ _iptables_arguments()
             WORDS="srcip srcport dstip dstport"
             [[ $CUR = "," ]] && CUR=""
         
-        elif [[ $LVAL = icmp && $PREV = --icmp-type ]]; then
+        elif [[ $LVAL = @(icmp|all) && $PREV = --icmp-type ]]; then
             WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
-        elif [[ $LVAL = icmp6 && $PREV = --icmpv6-type ]]; then
+        elif [[ $LVAL = @(icmp6|all) && $PREV = --icmpv6-type ]]; then
             WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid ICMPv6 Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
         
-        elif [[ $LVAL = mh && $PREV = --mh-type ]]; then
+        elif [[ $LVAL = @(mh|all) && $PREV = --mh-type ]]; then
             WORDS=$(sudo $CMD -p mh -h | sed -En '/^Valid MH Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
         elif [[ $LVAL = ipv6header && $LPRE = --header ]]; then
@@ -185,7 +192,11 @@ _iptables_arguments()
                 --mode) WORDS="tunnel transport" ;;
             esac
 
-        elif [[ $LVAL = sctp ]]; then
+        elif [[ $LVAL = @(tcp|all) && $LPRE = --tcp-flags ]]; then
+            WORDS="SYN ACK FIN RST URG PSH ALL NONE"
+            [[ $CUR = "," ]] && CUR=""
+
+        elif [[ $LVAL = @(sctp|all) ]]; then
             if [[ $PREV = --chunk-types ]]; then
                 WORDS="all any only"
             elif [[ $PREV = DATA && $CUR = ":" ]]; then
@@ -209,10 +220,6 @@ _iptables_arguments()
         elif [[ $LVAL = string && $PREV = --algo ]]; then
             WORDS="bm kmp"
         
-        elif [[ $LVAL = tcp && $LPRE = --tcp-flags ]]; then
-            WORDS="SYN ACK FIN RST URG PSH ALL NONE"
-            [[ $CUR = "," ]] && CUR=""
-
         elif [[ $LVAL = time && $LPRE = --weekdays ]]; then
             WORDS="Mon Tue Wed Thu Fri Sat Sun"
             [[ $CUR = "," ]] && CUR=""
