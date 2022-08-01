@@ -278,7 +278,7 @@ _iptables()
     if ! [[ $PROMPT_COMMAND =~ "COMP_WORDBREAKS=" ]]; then
         PROMPT_COMMAND="COMP_WORDBREAKS=${COMP_WORDBREAKS@Q}; "$PROMPT_COMMAND
     fi
-    if ! [[ $COMP_WORDBREAKS =~ "," ]]; then COMP_WORDBREAKS+=","; fi
+    ! [[ $COMP_WORDBREAKS =~ "," ]] && COMP_WORDBREAKS+=","
 
     local CMD=${COMP_WORDS[0]}
     local CUR=${COMP_WORDS[COMP_CWORD]}
