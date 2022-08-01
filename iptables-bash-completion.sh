@@ -346,10 +346,10 @@ _iptables()
         [[ $CMD = ip6tables ]] && WORDS+=" dst eui64 frag hbh hl icmp6 ipv6header mh rt"
 
     else
-        [[ ${COMP_LINE% *} =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+) ]]
+        [[ $COMP_LINE =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
         local LOPT=${BASH_REMATCH[1]:--p}
         local LVAL=${BASH_REMATCH[2]:-all}
-        [[ ${COMP_LINE% *} =~ .*" "(--[[:alnum:]-]+) ]]
+        [[ $COMP_LINE =~ .*" "(--[[:alnum:]-]+)" " ]]
         local LPRE=${BASH_REMATCH[1]}
 
         if [ "${CUR:0:1}" = "-" ]; then
