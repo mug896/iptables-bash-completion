@@ -293,7 +293,7 @@ _iptables()
         WORDS+=" "$( _iptables_check -A --append -C --check -D --delete \
         -I --insert -R --replace -L --list -S --list-rules -F --flush -Z --zero \
         -N --new-chain -X --delete-chain -P --policy -E --rename-chain )
-        if [[ ${WORDS%%+( )} = "" || ${WORDS%%+( )} = "-t --table" ]]; then
+        if [[ ${WORDS%%*( )} = "" || ${WORDS%%*( )} = "-t --table" ]]; then
             WORDS+=" -4 --ipv4 -6 --ipv6 -p --protocol -s --source -d --destination 
             -m --match -j --jump -g --goto -i --in-interface -o --out-interface 
             -c --set-counters"
