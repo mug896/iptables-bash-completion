@@ -312,8 +312,16 @@ _iptables()
 --new-chain|-[[:alnum:]]*X|--delete-chain|-[[:alnum:]]*P|--policy|-[[:alnum:]]*E|\
 --rename-chain|-[[:alnum:]]*g|--goto)$
         || $PREV2 =~ ^(-[[:alnum:]]*E|--rename-chain)$) && ${CUR:0:1} != "-" ]]; then
-        WORDS="INPUT OUTPUT FORWARD PREROUTING POSTROUTING"
-        WORDS+=" "$( sudo $CMD -S | awk '{print $2}' )
+
+        [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+)" " ]]
+        case ${BASH_REMATCH[2]} in
+            raw) WORDS="PREROUTING OUTPUT" ;;
+            nat) WORDS="PREROUTING INPUT OUTPUT POSTROUTING" ;;
+            mangle) WORDS="PREROUTING OUTPUT INPUT FORWARD POSTROUTING" ;;
+            security) WORDS="INPUT OUTPUT FORWARD" ;;
+            *) WORDS="INPUT FORWARD OUTPUT" ;;             # filter table
+        esac
+        WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*i|--in-interface|-[[:alnum:]]*o|--out-interface|\
 --rateest1|--rateest2|--rateest-name)$ && ${CUR:0:1} != "-" ]]; then
@@ -329,7 +337,7 @@ _iptables()
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*j|--jump)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP RETURN"
-        WORDS+=" "$( sudo $CMD -S | awk '{print $2}' )
+        WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
         WORDS+=" AUDIT CHECKSUM CLASSIFY CONNMARK CONNSECMARK CT DNAT DSCP HMARK 
         IDLETIMER LED LOG MARK MASQUERADE NETMAP NFLOG NFQUEUE NOTRACK RATEEST 
         REDIRECT REJECT SECMARK SET SNAT SYNPROXY TCPMSS TCPOPTSTRIP TEE TOS TPROXY TRACE"
