@@ -312,7 +312,7 @@ _iptables()
 --new-chain|-[[:alnum:]]*X|--delete-chain|-[[:alnum:]]*P|--policy|-[[:alnum:]]*E|\
 --rename-chain|-[[:alnum:]]*g|--goto)$ && ${CUR:0:1} != "-" ]]; then
 
-        if [[ $PREV != @(-E|--rename-chain) ]]; then
+        if [[ $PREV != @(-E|--rename-chain|-N|--new-chain) ]]; then
             [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
             case ${BASH_REMATCH[2]} in
                 raw) WORDS="PREROUTING OUTPUT" ;;
