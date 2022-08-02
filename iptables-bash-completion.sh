@@ -321,7 +321,9 @@ _iptables()
             security) WORDS="INPUT OUTPUT FORWARD" ;;
             *) WORDS="INPUT FORWARD OUTPUT" ;;             # filter table
         esac
-        WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
+        if [[ $PREV != @(-P|--policy) ]]; then
+            WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
+        fi
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*i|--in-interface|-[[:alnum:]]*o|--out-interface|\
 --rateest1|--rateest2|--rateest-name)$ && ${CUR:0:1} != "-" ]]; then
