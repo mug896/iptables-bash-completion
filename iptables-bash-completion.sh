@@ -306,21 +306,22 @@ _iptables()
     if [[ $PREV =~ ^(-[[:alnum:]]*t|--table)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="filter nat mangle raw security"
 
-    elif [[ ($PREV =~ ^(-[[:alnum:]]*A|--append|-[[:alnum:]]*C|--check|-[[:alnum:]]*D|\
+    elif [[ $PREV =~ ^(-[[:alnum:]]*A|--append|-[[:alnum:]]*C|--check|-[[:alnum:]]*D|\
 --delete|-[[:alnum:]]*I|--insert|-[[:alnum:]]*R|--replace|-[[:alnum:]]*L|--list|\
 -[[:alnum:]]*S|--list-rules|-[[:alnum:]]*F|--flush|-[[:alnum:]]*Z|--zero|-[[:alnum:]]*N|\
 --new-chain|-[[:alnum:]]*X|--delete-chain|-[[:alnum:]]*P|--policy|-[[:alnum:]]*E|\
---rename-chain|-[[:alnum:]]*g|--goto)$
-        || $PREV2 =~ ^(-[[:alnum:]]*E|--rename-chain)$) && ${CUR:0:1} != "-" ]]; then
+--rename-chain|-[[:alnum:]]*g|--goto)$ && ${CUR:0:1} != "-" ]]; then
 
-        [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
-        case ${BASH_REMATCH[2]} in
-            raw) WORDS="PREROUTING OUTPUT" ;;
-            nat) WORDS="PREROUTING INPUT OUTPUT POSTROUTING" ;;
-            mangle) WORDS="PREROUTING OUTPUT INPUT FORWARD POSTROUTING" ;;
-            security) WORDS="INPUT OUTPUT FORWARD" ;;
-            *) WORDS="INPUT FORWARD OUTPUT" ;;             # filter table
-        esac
+        if [[ $PREV != @(-E|--rename-chain) ]]; then
+            [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
+            case ${BASH_REMATCH[2]} in
+                raw) WORDS="PREROUTING OUTPUT" ;;
+                nat) WORDS="PREROUTING INPUT OUTPUT POSTROUTING" ;;
+                mangle) WORDS="PREROUTING OUTPUT INPUT FORWARD POSTROUTING" ;;
+                security) WORDS="INPUT OUTPUT FORWARD" ;;
+                *) WORDS="INPUT FORWARD OUTPUT" ;;             # filter table
+            esac
+        fi
         if [[ $PREV != @(-P|--policy) ]]; then
             WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
         fi
