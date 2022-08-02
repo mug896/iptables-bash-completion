@@ -273,6 +273,27 @@ _iptables_check()
     done        
     echo "$@"
 }
+_iptables_number()
+{
+    local chain=$1
+    _iptables_number=$( sudo $CMD -S | awk '{ 
+        if ($1 == "-A" && $2 == "'"$chain"'") { 
+            $1 = $2 = ""; sub(/^ +/,"")
+            a[i++] = $0 
+        }
+    } END { 
+        a[i] = "------  END  ------"
+        if (isarray(a)) {
+            if (length(a) == 1) print a[0]
+            else { 
+                len=length(i)
+                for (j in a) 
+                    printf "%0*d) %s\n", len, j+1, a[j]
+            }
+    }}')
+    IFS=$'\n'
+    COMPREPLY=( $_iptables_number )
+}
 _iptables() 
 {
     if ! [[ $PROMPT_COMMAND =~ "COMP_WORDBREAKS=" ]]; then
@@ -355,6 +376,11 @@ _iptables()
         tcpmss time tos u32 udp"
         [[ $CMD = iptables ]] && WORDS+=" icmp realm ttl"
         [[ $CMD = ip6tables ]] && WORDS+=" dst eui64 frag hbh hl icmp6 ipv6header mh rt"
+
+    elif [[ $PREV2 =~ ^(-[[:alnum:]]*D|--delete|-[[:alnum:]]*C|--check|\
+-[[:alnum:]]*R|--replace)$ && ${CUR:0:1} != "-" ]]; then
+        _iptables_number $PREV
+        return
 
     else
         [[ $COMP_LINE2 =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
