@@ -285,8 +285,8 @@ _iptables()
     local PREV=${COMP_WORDS[COMP_CWORD-1]}
     local PREV2=${COMP_WORDS[COMP_CWORD-2]}
     local IFS=$' \t\n' WORDS 
-    COMP_LINE=${COMP_LINE:0:$COMP_POINT}
-    [[ ${COMP_LINE: -1} = " " && -n $CUR ]] && CUR=""
+    COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
+    [[ ${COMP_LINE2: -1} = " " && -n $CUR ]] && CUR=""
 
     if [ "${CUR:0:1}" = "-" ]; then
         WORDS=$( _iptables_check -t --table )
@@ -354,10 +354,10 @@ _iptables()
         [[ $CMD = ip6tables ]] && WORDS+=" dst eui64 frag hbh hl icmp6 ipv6header mh rt"
 
     else
-        [[ $COMP_LINE =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
+        [[ $COMP_LINE2 =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
         local LOPT=${BASH_REMATCH[1]:--p}
         local LVAL=${BASH_REMATCH[2]:-all}
-        [[ $COMP_LINE =~ .*" "(--[[:alnum:]-]+)" " ]]
+        [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
         local LPRE=${BASH_REMATCH[1]}
 
         if [ "${CUR:0:1}" = "-" ]; then
