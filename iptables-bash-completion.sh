@@ -276,7 +276,7 @@ _iptables_check()
 _iptables_number()
 {
     local chain=$1
-    WORDS=$( sudo $CMD -S | awk '{ 
+    WORDS=$( sudo $CMD -S $chain | awk '{ 
         if ($1 == "-A" && $2 == "'"$chain"'") { 
             $1 = $2 = ""; sub(/^ +/,"")
             a[i++] = $0 
