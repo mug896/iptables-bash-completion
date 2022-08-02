@@ -337,12 +337,12 @@ _iptables()
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*j|--jump)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP RETURN"
-        WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
         WORDS+=" AUDIT CHECKSUM CLASSIFY CONNMARK CONNSECMARK CT DNAT DSCP HMARK 
         IDLETIMER LED LOG MARK MASQUERADE NETMAP NFLOG NFQUEUE NOTRACK RATEEST 
         REDIRECT REJECT SECMARK SET SNAT SYNPROXY TCPMSS TCPOPTSTRIP TEE TOS TPROXY TRACE"
         [[ $CMD = iptables ]] && WORDS+=" CLUSTERIP ECN TTL ULOG"
         [[ $CMD = ip6tables ]] && WORDS+=" DNPT HL SNPT"
+        WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*m|--match)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="addrtype ah bpf cgroup cluster comment connbytes connlabel connlimit
