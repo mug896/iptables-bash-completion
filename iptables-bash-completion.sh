@@ -313,7 +313,7 @@ _iptables()
 --rename-chain|-[[:alnum:]]*g|--goto)$
         || $PREV2 =~ ^(-[[:alnum:]]*E|--rename-chain)$) && ${CUR:0:1} != "-" ]]; then
 
-        [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+)" " ]]
+        [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
         case ${BASH_REMATCH[2]} in
             raw) WORDS="PREROUTING OUTPUT" ;;
             nat) WORDS="PREROUTING INPUT OUTPUT POSTROUTING" ;;
