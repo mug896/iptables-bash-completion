@@ -5,6 +5,12 @@ open new terminal and try auto completion.
 
 
 ```sh
+bash$ lsb_release -a
+Distributor ID: Ubuntu
+Description:    Ubuntu 22.04 LTS
+Release:        22.04
+Codename:       jammy
+
 bash$ iptables -v
 iptables v1.8.7 (nf_tables): no command specified
 Try `iptables -h' or 'iptables --help' for more information.
