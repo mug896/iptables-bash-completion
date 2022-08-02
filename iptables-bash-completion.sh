@@ -1,4 +1,4 @@
-_iptables_options()
+_iptables_option()
 {
     if [[ $LOPT = @(-m|--match|-p|--protocol) ]]; then
         case $LVAL in
@@ -132,7 +132,7 @@ _iptables_options()
         esac
     fi
 }
-_iptables_arguments()
+_iptables_argument()
 {
     if [[ $LOPT = @(-m|--match|-p|--protocol) ]]; then
 
@@ -382,16 +382,22 @@ _iptables()
         return
 
     else
-        [[ $COMP_LINE2 =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
-        local LOPT=${BASH_REMATCH[1]:--p}
-        local LVAL=${BASH_REMATCH[2]:-all}
-        [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
-        local LPRE=${BASH_REMATCH[1]}
-
+        local LOPT LVAL LPRE
         if [ "${CUR:0:1}" = "-" ]; then
-            _iptables_options
+            [[ $COMP_LINE2 =~ .*" "(-p|--protocol)" "+([[:alnum:]]+)" " ]]
+            LOPT=${BASH_REMATCH[1]:--p}
+            LVAL=${BASH_REMATCH[2]:-all}
+            _iptables_option
+        fi
+        [[ $COMP_LINE2 =~ .*" "(-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
+        LOPT=${BASH_REMATCH[1]}
+        LVAL=${BASH_REMATCH[2]}
+        [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
+        LPRE=${BASH_REMATCH[1]}
+        if [ "${CUR:0:1}" = "-" ]; then
+            _iptables_option
         else
-            _iptables_arguments
+            _iptables_argument
         fi
     fi
 
