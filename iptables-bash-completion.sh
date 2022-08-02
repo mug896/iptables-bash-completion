@@ -276,7 +276,7 @@ _iptables_check()
 _iptables_number()
 {
     local chain=$1
-    WORDS=$( sudo $CMD -S $chain | awk '{ 
+    WORDS=$( sudo $CMD -S $chain | gawk '{
         if ($1 == "-A" && $2 == "'"$chain"'") { 
             $1 = $2 = ""; sub(/^ +/,"")
             a[i++] = $0 
@@ -343,7 +343,7 @@ _iptables()
             esac
         fi
         if [[ $PREV != @(-P|--policy) ]]; then
-            WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
+            WORDS+=" "$( sudo $CMD -S | gawk '{ if ($1 == "-N") print $2 }' )
         fi
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*i|--in-interface|-[[:alnum:]]*o|--out-interface|\
@@ -365,7 +365,7 @@ _iptables()
         REDIRECT REJECT SECMARK SET SNAT SYNPROXY TCPMSS TCPOPTSTRIP TEE TOS TPROXY TRACE"
         [[ $CMD = iptables ]] && WORDS+=" CLUSTERIP ECN TTL ULOG"
         [[ $CMD = ip6tables ]] && WORDS+=" DNPT HL SNPT"
-        WORDS+=" "$( sudo $CMD -S | awk '{ if ($1 == "-N") print $2 }' )
+        WORDS+=" "$( sudo $CMD -S | gawk '{ if ($1 == "-N") print $2 }' )
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*m|--match)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="addrtype ah bpf cgroup cluster comment connbytes connlabel connlimit
