@@ -160,13 +160,13 @@ _iptables_argument()
             [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL = @(icmp|all|0) && $PREV = --icmp-type ]]; then
-            WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+            WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/\0/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
         elif [[ $LVAL = @(icmp6|all|0) && $PREV = --icmpv6-type ]]; then
-            WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid ICMPv6 Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+            WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid ICMPv6 Types:/I,/\0/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
         
         elif [[ $LVAL = @(mh|all|0) && $PREV = --mh-type ]]; then
-            WORDS=$(sudo $CMD -p mh -h | sed -En '/^Valid MH Types:/I,/END/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+            WORDS=$(sudo $CMD -p mh -h | sed -En '/^Valid MH Types:/I,/\0/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
         elif [[ $LVAL = ipv6header && $LPRE = --header ]]; then
             WORDS="hop hop-by-hop dst route frag auth esp none prot"
@@ -388,7 +388,7 @@ _iptables()
             LVAL=${BASH_REMATCH[2]:-all}
             _iptables_option
         fi
-        [[ $COMP_LINE2 =~ .*" "(-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
+        [[ $COMP_LINE2 =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
         LOPT=${BASH_REMATCH[1]}
         LVAL=${BASH_REMATCH[2]}
         [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
@@ -401,7 +401,7 @@ _iptables()
     fi
 
     COMPREPLY=( $(compgen -W "$WORDS" -- $CUR) )
-    [[ "${COMPREPLY: -1}" =~ =|: ]] && compopt -o nospace
+    [[ ${COMPREPLY: -1} =~ "=" ]] && compopt -o nospace
 }
 
 complete -F _iptables iptables ip6tables
