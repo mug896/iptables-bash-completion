@@ -393,7 +393,7 @@ _iptables()
         LVAL=${BASH_REMATCH[2]}
         [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
         LPRE=${BASH_REMATCH[1]}
-        if [ "${CUR:0:1}" = "-" ]; then
+        if [[ ${CUR:0:1} = "-" && $LOPT != @(-p|--protocol) ]]; then
             _iptables_option
         else
             _iptables_argument
