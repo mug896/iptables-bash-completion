@@ -291,8 +291,7 @@ _iptables_number()
                     printf "%0*d) %s\n", len, j+1, a[j]
             }
     }}')
-    IFS=$'\n'
-    COMPREPLY=( $WORDS )
+    IFS=$'\n' COMPREPLY=( $WORDS )
 }
 _iptables() 
 {
