@@ -275,8 +275,8 @@ _iptables_check()
 }
 _iptables_number()
 {
-    local chain=$1
-    WORDS=$( sudo $CMD -S $chain | gawk '{
+    local table=$1 chain=$2
+    WORDS=$( sudo $CMD -t $table -S $chain | gawk '{
         if ($1 == "-A" && $2 == "'"$chain"'") { 
             $1 = $2 = ""; sub(/^ +/,"")
             a[i++] = $0 
@@ -305,6 +305,8 @@ _iptables()
     local PREV=${COMP_WORDS[COMP_CWORD-1]}
     local PREV2=${COMP_WORDS[COMP_CWORD-2]}
     local IFS=$' \t\n' WORDS 
+    [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
+    local TABLE=${BASH_REMATCH[2]:-filter}
     COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
     [[ ${COMP_LINE2: -1} = " " && -n $CUR ]] && CUR=""
 
@@ -332,8 +334,7 @@ _iptables()
 --rename-chain|-[[:alnum:]]*g|--goto)$ && ${CUR:0:1} != "-" ]]; then
 
         if [[ $PREV != @(-E|--rename-chain|-N|--new-chain) ]]; then
-            [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
-            case ${BASH_REMATCH[2]} in
+            case $TABLE in
                 raw) WORDS="PREROUTING OUTPUT" ;;
                 nat) WORDS="PREROUTING INPUT OUTPUT POSTROUTING" ;;
                 mangle) WORDS="PREROUTING OUTPUT INPUT FORWARD POSTROUTING" ;;
@@ -377,7 +378,7 @@ _iptables()
 
     elif [[ $PREV2 =~ ^(-[[:alnum:]]*D|--delete|-[[:alnum:]]*C|--check|\
 -[[:alnum:]]*R|--replace)$ && ${CUR:0:1} != "-" ]]; then
-        _iptables_number $PREV
+        _iptables_number $TABLE $PREV
         return
 
     else
