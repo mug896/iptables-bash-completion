@@ -343,7 +343,7 @@ _iptables()
             esac
         fi
         if [[ $PREV != @(-P|--policy) ]]; then
-            WORDS+=" "$( sudo $CMD -S | gawk '{ if ($1 == "-N") print $2 }' )
+            WORDS+=" "$( sudo $CMD -t $TABLE -L | gawk '/^Chain /{ print $2 }' )
         fi
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*i|--in-interface|-[[:alnum:]]*o|--out-interface|\
