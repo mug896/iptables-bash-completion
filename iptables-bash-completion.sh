@@ -276,8 +276,8 @@ _iptables_check()
 _iptables_number()
 {
     local table=$1 chain=$2
-    WORDS=$( sudo $CMD -t $table -S | gawk '{
-        if ($1 == "-A" && $2 == "'"$chain"'") { 
+    WORDS=$( sudo $CMD -t $table -S $chain 2>/dev/null | gawk '{
+        if ($1 == "-A") { 
             $1 = $2 = ""; sub(/^ +/,"")
             a[i++] = $0 
         }
