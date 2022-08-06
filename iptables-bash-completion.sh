@@ -365,7 +365,7 @@ _iptables()
         REDIRECT REJECT SECMARK SET SNAT SYNPROXY TCPMSS TCPOPTSTRIP TEE TOS TPROXY TRACE"
         [[ $CMD = iptables ]] && WORDS+=" CLUSTERIP ECN TTL ULOG"
         [[ $CMD = ip6tables ]] && WORDS+=" DNPT HL SNPT"
-        WORDS+=" "$( sudo $CMD -S | gawk '{ if ($1 == "-N") print $2 }' )
+        WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*m|--match)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="addrtype ah bpf cgroup cluster comment connbytes connlabel connlimit
