@@ -283,13 +283,13 @@ _iptables_target()
     case $TABLE in
         raw) WORDS+=" CT NOTRACK TRACE" ;;
         nat) WORDS+=" NETMAP"
-             [[ $CHAIN = @(PREROUTING|OUTPUT|USER_DEFINED) ]] && WORDS+=" DNAT REDIRECT"
-             [[ $CHAIN = @(POSTROUTING|INPUT|USER_DEFINED) ]] && WORDS+=" SNAT"
-             [[ $CHAIN = POSTROUTING ]] && WORDS+=" MASQUERADE" ;;
+            [[ $CHAIN = @(PREROUTING|OUTPUT|USER_DEFINED) ]] && WORDS+=" DNAT REDIRECT"
+            [[ $CHAIN = @(POSTROUTING|INPUT|USER_DEFINED) ]] && WORDS+=" SNAT"
+            [[ $CHAIN = POSTROUTING ]] && WORDS+=" MASQUERADE" ;;
         mangle) WORDS+=" CHECKSUM CONNSECMARK SECMARK DSCP TOS" 
-                [[ $CMD = iptables ]] && WORDS+=" ECN TTL"
-                [[ $CMD = ip6tables ]] && WORDS+=" DNPT SNPT HL"
-                [[ $CHAIN = @(PREROUTING|USER_DEFINED) ]] && WORDS+=" TPROXY" ;;
+            [[ $CMD = iptables ]] && WORDS+=" ECN TTL"
+            [[ $CMD = ip6tables ]] && WORDS+=" DNPT SNPT HL"
+            [[ $CHAIN = @(PREROUTING|USER_DEFINED) ]] && WORDS+=" TPROXY" ;;
         security) WORDS+=" CONNSECMARK SECMARK" ;;
     esac
     WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
