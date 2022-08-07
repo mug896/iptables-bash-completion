@@ -307,6 +307,11 @@ _iptables()
     local IFS=$' \t\n' WORDS 
     [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
     local TABLE=${BASH_REMATCH[2]:-filter}
+    [[ $COMP_LINE =~ .*" "(-A|--append|-I|--insert|-R|--replace)" "+([[:alnum:]]+) ]]
+    local CHAIN=${BASH_REMATCH[2]}
+    if [[ -n $CHAIN && $CHAIN != @(PREROUTING|INPUT|OUTPUT|FORWARD|POSTROUTING) ]]; then
+        CHAIN=USER_DEFINED
+    fi
     COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
     [[ ${COMP_LINE2: -1} = " " && -n $CUR ]] && CUR=""
 
@@ -360,21 +365,38 @@ _iptables()
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*j|--jump)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP RETURN"
-        WORDS+=" AUDIT CHECKSUM CLASSIFY CONNMARK CONNSECMARK CT DNAT DSCP HMARK 
-        IDLETIMER LED LOG MARK MASQUERADE NETMAP NFLOG NFQUEUE NOTRACK RATEEST 
-        REDIRECT REJECT SECMARK SET SNAT SYNPROXY TCPMSS TCPOPTSTRIP TEE TOS TPROXY TRACE"
-        [[ $CMD = iptables ]] && WORDS+=" CLUSTERIP ECN TTL ULOG"
-        [[ $CMD = ip6tables ]] && WORDS+=" DNPT HL SNPT"
+        WORDS+=" AUDIT CLASSIFY CONNMARK HMARK IDLETIMER LED LOG MARK NFLOG 
+                NFQUEUE RATEEST SET SNAT SYNPROXY TCPMSS TCPOPTSTRIP TEE"
+        [[ $CHAIN = @(INPUT|OUTPUT|FORWARD|USER_DEFINED) ]] && WORDS+=" REJECT"
+        [[ $CMD = iptables ]] && WORDS+=" CLUSTERIP ULOG"
+        case $TABLE in
+            raw) WORDS+=" CT NOTRACK TRACE" ;;
+            nat) WORDS+=" NETMAP"
+                 [[ $CHAIN = @(PREROUTING|OUTPUT|USER_DEFINED) ]] && WORDS+=" DNAT REDIRECT"
+                 [[ $CHAIN = @(POSTROUTING|INPUT|USER_DEFINED) ]] && WORDS+=" SNAT"
+                 [[ $CHAIN = POSTROUTING ]] && WORDS+=" MASQUERADE" ;;
+            mangle) WORDS+=" CHECKSUM CONNSECMARK SECMARK DSCP TOS" 
+                    [[ $CMD = iptables ]] && WORDS+=" ECN TTL"
+                    [[ $CMD = ip6tables ]] && WORDS+=" DNPT SNPT HL"
+                    [[ $CHAIN = @(PREROUTING|USER_DEFINED) ]] && WORDS+=" TPROXY" ;;
+            security) WORDS+=" CONNSECMARK SECMARK" ;;
+        esac
         WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
 
     elif [[ $PREV =~ ^(-[[:alnum:]]*m|--match)$ && ${CUR:0:1} != "-" ]]; then
         WORDS="addrtype ah bpf cgroup cluster comment connbytes connlabel connlimit
         connmark conntrack cpu dccp devgroup dscp ecn esp hashlimit helper iprange
-        ipvs length limit mac mark multiport nfacct osf owner physdev pkttype policy 
-        quota rateest recent rpfilter sctp set socket state statistic string tcp 
+        ipvs length limit mark multiport nfacct osf physdev pkttype policy 
+        quota rateest recent sctp set socket state statistic string tcp 
         tcpmss time tos u32 udp"
+        [[ $CHAIN = @(PREROUTING|INPUT|FORWARD) ]] && WORDS+=" mac"
+        [[ $CHAIN = @(POSTROUTING|OUTPUT) ]] && WORDS+=" owner"
+        [[ $TABLE = @(raw|mangle) && $CHAIN = PREROUTING ]] && WORDS+=" rpfilter"
         [[ $CMD = iptables ]] && WORDS+=" icmp realm ttl"
-        [[ $CMD = ip6tables ]] && WORDS+=" dst eui64 frag hbh hl icmp6 ipv6header mh rt"
+        if [[ $CMD = ip6tables ]]; then
+            WORDS+=" dst frag hbh hl icmp6 ipv6header mh rt"
+            [[ $CHAIN = @(PREROUTING|INPUT|FORWARD) ]] && WORDS+=" eui64"
+        fi
 
     elif [[ $PREV2 =~ ^(-[[:alnum:]]*D|--delete|-[[:alnum:]]*C|--check|\
 -[[:alnum:]]*R|--replace)$ && ${CUR:0:1} != "-" ]]; then
