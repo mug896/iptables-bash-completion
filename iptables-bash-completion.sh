@@ -259,6 +259,7 @@ _iptables_argument()
 }
 _iptables_match()
 {
+    # man iptables-extensions | sed -En '/^MATCH EXTENSIONS$/,/^TARGET EXTENSIONS$/{ //d; /^[ ]{3}[[:alnum:]]/p }'
     WORDS="addrtype ah bpf cgroup cluster comment connbytes connlabel connlimit
     connmark conntrack cpu dccp devgroup dscp ecn esp hashlimit helper iprange
     ipvs length limit mark multiport nfacct osf physdev pkttype policy 
@@ -275,6 +276,7 @@ _iptables_match()
 }
 _iptables_target()
 {
+    # man iptables-extensions | sed -En '/^TARGET EXTENSIONS/,/\a/{ //d; /^[ ]{3}[[:alnum:]]/p }'
     WORDS="ACCEPT DROP RETURN"
     WORDS+=" AUDIT CLASSIFY CONNMARK HMARK IDLETIMER LED LOG MARK NFLOG 
             NFQUEUE RATEEST SET SYNPROXY TCPMSS TCPOPTSTRIP TEE"
