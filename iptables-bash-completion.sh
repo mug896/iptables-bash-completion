@@ -351,7 +351,7 @@ _iptables()
     if [[ -n $CHAIN && $CHAIN != @(PREROUTING|INPUT|OUTPUT|FORWARD|POSTROUTING) ]]; then
         CHAIN=USER_DEFINED
     fi
-    COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
+    local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
     [[ ${COMP_LINE2: -1} = " " && -n $CUR ]] && CUR=""
 
     if [ "${CUR:0:1}" = "-" ]; then
