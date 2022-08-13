@@ -351,6 +351,10 @@ _iptables()
     if [[ -n $CHAIN && $CHAIN != @(PREROUTING|INPUT|OUTPUT|FORWARD|POSTROUTING) ]]; then
         CHAIN=USER_DEFINED
     fi
+    # 아래와 같이 커서를 이동시킨후 -b 옵션 값을 완성하기 위해 tab 키를 누르면
+    # $CUR 변수에 "-c" 값이 들어가게 되어 정상적으로 동작하지 않는다.
+    # 따라서 커서 앞이 " " 문자인데 $CUR 변수에 값이 존재하면 empty 로 설정해야 한다.
+    # $ command -a -b [cursor]-c ddd 
     local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
     [[ ${COMP_LINE2: -1} = " " && -n $CUR ]] && CUR=""
 
