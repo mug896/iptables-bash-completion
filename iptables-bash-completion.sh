@@ -323,7 +323,7 @@ _iptables_number()
         }
     } END { 
         if (isarray(a)) {
-            len=length(i)
+            len = length(i)
             for (j in a) 
                 printf "%0*d) %s\n", len, j+1, a[j]
     }}')
