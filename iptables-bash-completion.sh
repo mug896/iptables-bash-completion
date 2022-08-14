@@ -155,6 +155,7 @@ _iptables_argument()
 
         elif [[ $LVAL = dccp && $PREV = --dccp-types ]]; then
             WORDS="REQUEST RESPONSE DATA ACK DATAACK CLOSEREQ CLOSE RESET SYNC SYNCACK INVALID"
+
         elif [[ $LVAL = hashlimit && $LPRE = --hashlimit-mode ]]; then
             WORDS="srcip srcport dstip dstport"
             [[ $CUR = "," ]] && CUR=""
