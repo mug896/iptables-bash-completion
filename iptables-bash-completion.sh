@@ -321,16 +321,13 @@ _iptables_number()
             a[i++] = $0 
         }
     } END { 
-        a[i] = "------  END  ------"
         if (isarray(a)) {
-            if (length(a) == 1) print a[0]
-            else { 
-                len=length(i)
-                for (j in a) 
-                    printf "%0*d) %s\n", len, j+1, a[j]
-            }
+            len=length(i)
+            for (j in a) 
+                printf "%0*d) %s\n", len, j+1, a[j]
     }}')
     IFS=$'\n' COMPREPLY=( $WORDS )
+    [[ ${#COMPREPLY[@]} = 1 ]] && COMPREPLY+=( "2) __END__" )
 }
 _iptables() 
 {
@@ -375,7 +372,7 @@ _iptables()
     if [[ $PREV = @(-!(-*)t|--table) && ${CUR:0:1} != "-" ]]; then
         WORDS="filter nat mangle raw security"
 
-    elif [[ $PREV = @(-!(-*)[ACDIRLSFZNXPEg]|--append|--check| --delete|--insert|\
+    elif [[ $PREV = @(-!(-*)[ACDIRLSFZNXPEg]|--append|--check|--delete|--insert|\
 --replace|--list|--list-rules|--flush|--zero|--new-chain|--delete-chain|--policy|\
 --rename-chain|--goto) && ${CUR:0:1} != "-" ]]; then
 
