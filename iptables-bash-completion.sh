@@ -372,14 +372,12 @@ _iptables()
         --line-numbers --modprobe="
     fi
 
-    if [[ $PREV =~ ^(-[[:alnum:]]*t|--table)$ && ${CUR:0:1} != "-" ]]; then
+    if [[ $PREV = @(-!(-*)t|--table) && ${CUR:0:1} != "-" ]]; then
         WORDS="filter nat mangle raw security"
 
-    elif [[ $PREV =~ ^(-[[:alnum:]]*A|--append|-[[:alnum:]]*C|--check|-[[:alnum:]]*D|\
---delete|-[[:alnum:]]*I|--insert|-[[:alnum:]]*R|--replace|-[[:alnum:]]*L|--list|\
--[[:alnum:]]*S|--list-rules|-[[:alnum:]]*F|--flush|-[[:alnum:]]*Z|--zero|-[[:alnum:]]*N|\
---new-chain|-[[:alnum:]]*X|--delete-chain|-[[:alnum:]]*P|--policy|-[[:alnum:]]*E|\
---rename-chain|-[[:alnum:]]*g|--goto)$ && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV = @(-!(-*)[ACDIRLSFZNXPEg]|--append|--check| --delete|--insert|\
+--replace|--list|--list-rules|--flush|--zero|--new-chain|--delete-chain|--policy|\
+--rename-chain|--goto) && ${CUR:0:1} != "-" ]]; then
 
         if [[ $PREV != @(-E|--rename-chain|-N|--new-chain) ]]; then
             case $TABLE in
@@ -394,26 +392,25 @@ _iptables()
             WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
         fi
 
-    elif [[ $PREV =~ ^(-[[:alnum:]]*i|--in-interface|-[[:alnum:]]*o|--out-interface|\
---rateest1|--rateest2|--rateest-name)$ && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV = @(-!(-*)[io]|--in-interface|--out-interface|--rateest1|--rateest2|\
+--rateest-name) && ${CUR:0:1} != "-" ]]; then
         WORDS=$( \ls /sys/class/net/ )
 
-    elif [[ $PREV =~ ^(-[[:alnum:]]*p|--protocol)$ && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV = @(-!(-*)p|--protocol) && ${CUR:0:1} != "-" ]]; then
         WORDS="tcp udp udplite esp ah sctp all"
         [[ $CMD = iptables ]] && WORDS+=" icmp"
         [[ $CMD = ip6tables ]] && WORDS+=" icmp6 mh"
     
-    elif [[ $PREV2 =~ ^(-[[:alnum:]]*P|--policy)$ && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV2 = @(-!(-*)P|--policy) && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP"
 
-    elif [[ $PREV =~ ^(-[[:alnum:]]*j|--jump)$ && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV = @(-!(-*)j|--jump) && ${CUR:0:1} != "-" ]]; then
         _iptables_target
 
-    elif [[ $PREV =~ ^(-[[:alnum:]]*m|--match)$ && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV = @(-!(-*)m|--match) && ${CUR:0:1} != "-" ]]; then
         _iptables_match
 
-    elif [[ $PREV2 =~ ^(-[[:alnum:]]*D|--delete|-[[:alnum:]]*C|--check|\
--[[:alnum:]]*R|--replace)$ && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV2 = @(-!(-*)[DCR]|--delete|--check|--replace) && ${CUR:0:1} != "-" ]]; then
         _iptables_number $TABLE $PREV
         return
 
