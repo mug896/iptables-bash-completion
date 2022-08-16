@@ -151,14 +151,12 @@ _iptables_argument()
                 --ctstate) WORDS="INVALID NEW ESTABLISHED RELATED UNTRACKED SNAT DNAT" ;;
                 --ctstatus) WORDS="NONE EXPECTED SEEN_REPLY ASSURED CONFIRMED" ;;
             esac
-            [[ $CUR = "," ]] && CUR=""
 
         elif [[ $LVAL = dccp && $PREV = --dccp-types ]]; then
             WORDS="REQUEST RESPONSE DATA ACK DATAACK CLOSEREQ CLOSE RESET SYNC SYNCACK INVALID"
 
         elif [[ $LVAL = hashlimit && $LPRE = --hashlimit-mode ]]; then
             WORDS="srcip srcport dstip dstport"
-            [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL = @(icmp|all|0) && $PREV = --icmp-type ]]; then
             WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
@@ -171,7 +169,6 @@ _iptables_argument()
 
         elif [[ $LVAL = ipv6header && $LPRE = --header ]]; then
             WORDS="hop hop-by-hop dst route frag auth esp none prot"
-            [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL = ipvs ]]; then
             case $PREV in
@@ -192,25 +189,22 @@ _iptables_argument()
 
         elif [[ $LVAL = @(tcp|all|0) && $LPRE = --tcp-flags ]]; then
             WORDS="SYN ACK FIN RST URG PSH ALL NONE"
-            [[ $CUR = "," ]] && CUR=""
 
         elif [[ $LVAL = @(sctp|all|0) ]]; then
             if [[ $PREV = --chunk-types ]]; then
                 WORDS="all any only"
-            elif [[ $PREV = DATA && $CUR = ":" ]]; then
+            elif [[ $PREV = DATA && ${COMP_WORDS[COMP_CWORD]} = ":" ]]; then
                 WORDS="I U B E i u b e"
-            elif [[ $PREV = @(ABORT|SHUTDOWN_COMPLETE) && $CUR = ":" ]]; then
+            elif [[ $PREV = @(ABORT|SHUTDOWN_COMPLETE) && ${COMP_WORDS[COMP_CWORD]} = ":" ]]; then
                 WORDS="T t ."
             elif [[ $LPRE = --chunk-types ]]; then
                 WORDS="DATA INIT INIT_ACK SACK HEARTBEAT HEARTBEAT_ACK ABORT SHUTDOWN
                     SHUTDOWN_ACK ERROR COOKIE_ECHO COOKIE_ACK ECN_ECNE  ECN_CWR
                     SHUTDOWN_COMPLETE ASCONF ASCONF_ACK FORWARD_TSN"
             fi
-            [[ $CUR = @(,|:) ]] && CUR=""
         
         elif [[ $LVAL = state && $LPRE = --state ]]; then
             WORDS="INVALID ESTABLISHED NEW RELATED UNTRACKED"
-            [[ $CUR = "," ]] && CUR=""
 
         elif [[ $LVAL = statistic && $PREV = --mode ]]; then
             WORDS="random nth"
@@ -220,7 +214,6 @@ _iptables_argument()
         
         elif [[ $LVAL = time && $LPRE = --weekdays ]]; then
             WORDS="Mon Tue Wed Thu Fri Sat Sun"
-            [[ $CUR = "," ]] && CUR=""
         fi
         
     elif [[ $LOPT = @(-j|--jump) ]]; then
@@ -233,11 +226,9 @@ _iptables_argument()
 
         elif [[ $LVAL = CT && $LPRE = --ctevents ]]; then
             WORDS="new related destroy reply assured protoinfo helper mark natseqinfo secmark"
-            [[ $CUR = "," ]] && CUR=""
 
         elif [[ $LVAL = HMARK && $LPRE = --hmark-tuple ]]; then
             WORDS="src dst sport dport spi ct"
-            [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL = LOG && $PREV = --log-level ]]; then
             WORDS="emerg alert crit error warning notice info debug"
@@ -254,7 +245,6 @@ _iptables_argument()
 
         elif [[ $LVAL = TCPOPTSTRIP && $LPRE = --strip-options ]]; then
             WORDS="wscale mss sack-permitted sack timestamp md5"
-            [[ $CUR = "," ]] && CUR=""
         fi
     fi
 }
@@ -337,10 +327,7 @@ _iptables()
     fi
     ! [[ $COMP_WORDBREAKS = *,* ]] && COMP_WORDBREAKS+=","
 
-    local CMD=${COMP_WORDS[0]}
-    local CUR=${COMP_WORDS[COMP_CWORD]}
-    local PREV=${COMP_WORDS[COMP_CWORD-1]}
-    local PREV2=${COMP_WORDS[COMP_CWORD-2]}
+    local CMD=$1 CUR=$2 PREV=$3 PREV2=${COMP_WORDS[COMP_CWORD-2]}
     local IFS=$' \t\n' WORDS 
     [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
     local TABLE=${BASH_REMATCH[2]:-filter}
@@ -349,14 +336,9 @@ _iptables()
     if [[ -n $CHAIN && $CHAIN != @(PREROUTING|INPUT|OUTPUT|FORWARD|POSTROUTING) ]]; then
         CHAIN=USER_DEFINED
     fi
-    # 아래와 같이 커서를 이동시킨후 -b 옵션 값을 완성하기 위해 tab 키를 누르면
-    # $CUR 변수에 "-c" 값이 들어가게 되어 정상적으로 동작하지 않는다.
-    # 따라서 커서 앞이 " " 문자인데 $CUR 변수에 값이 존재하면 empty 로 설정해야 한다.
-    # $ command -a -b [cursor]-c ddd 
     local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
-    [[ ${COMP_LINE2: -1} = " " && -n $CUR ]] && CUR=""
 
-    if [ "${CUR:0:1}" = "-" ]; then
+    if [[ ${CUR:0:1} = "-" ]]; then
         WORDS=$( _iptables_check -t --table )
         WORDS+=" "$( _iptables_check -A --append -C --check -D --delete \
         -I --insert -R --replace -L --list -S --list-rules -F --flush -Z --zero \
@@ -414,7 +396,7 @@ _iptables()
 
     else
         local LOPT LVAL LPRE
-        if [ "${CUR:0:1}" = "-" ]; then
+        if [[ ${CUR:0:1} = "-" ]]; then
             [[ $COMP_LINE2 =~ .*" "(-p|--protocol)" "+([[:alnum:]]+)" " ]]
             LOPT=${BASH_REMATCH[1]:--p}
             LVAL=${BASH_REMATCH[2]:-all}
