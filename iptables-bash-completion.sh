@@ -336,7 +336,6 @@ _iptables()
     if [[ -n $CHAIN && $CHAIN != @(PREROUTING|INPUT|OUTPUT|FORWARD|POSTROUTING) ]]; then
         CHAIN=USER_DEFINED
     fi
-    local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
 
     if [[ ${CUR:0:1} = "-" ]]; then
         WORDS=$( _iptables_check -t --table )
@@ -396,6 +395,7 @@ _iptables()
 
     else
         local LOPT LVAL LPRE
+        local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
         if [[ ${CUR:0:1} = "-" ]]; then
             [[ $COMP_LINE2 =~ .*" "(-p|--protocol)" "+([[:alnum:]]+)" " ]]
             LOPT=${BASH_REMATCH[1]:--p}
