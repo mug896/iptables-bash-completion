@@ -1,17 +1,17 @@
 _iptables_option()
 {
-    if [[ $LOPT = @(-m|--match|-p|--protocol) ]]; then
+    if [[ $LOPT == @(-m|--match|-p|--protocol) ]]; then
         case $LVAL in
             all|0) WORDS+=" --source-port --sport --destination-port --dport
                 --tcp-flags --syn --tcp-option --chunk-types --espspi --ahspi"
-                if [[ $CMD = ip6tables ]]; then
+                if [[ $CMD == ip6tables ]]; then
 	                WORDS+=" --ahlen --ahres --icmpv6-type --mh-type"
                 else
 	                WORDS+=" --icmp-type"
                 fi ;;
             addrtype) WORDS+=" --src-type --dst-type --limit-iface-in --limit-iface-out" ;;
             ah) WORDS+=" --ahspi"
-                [[ $CMD = ip6tables ]] && WORDS+=" --ahlen --ahres" ;;
+                [[ $CMD == ip6tables ]] && WORDS+=" --ahlen --ahres" ;;
             bpf) WORDS+=" --object-pinned --bytecode" ;;
             cgroup) WORDS+=" --path --cgroup" ;;
             cluster) WORDS+=" --cluster-total-nodes --cluster-local-node 
@@ -86,7 +86,7 @@ _iptables_option()
             udp) WORDS+=" --source-port --sport --destination-port --dport" ;;
         esac
     
-    elif [[ $LOPT = @(-j|--jump) ]]; then
+    elif [[ $LOPT == @(-j|--jump) ]]; then
         case $LVAL in
             AUDIT) WORDS+=" --type" ;;
             CHECKSUM) WORDS+=" --checksum-fill" ;;
@@ -134,52 +134,52 @@ _iptables_option()
 }
 _iptables_argument()
 {
-    if [[ $LOPT = @(-m|--match|-p|--protocol) ]]; then
+    if [[ $LOPT == @(-m|--match|-p|--protocol) ]]; then
 
-        if [[ $LVAL = addrtype && $PREV = @(--src-type|--dst-type) ]]; then
+        if [[ $LVAL == addrtype && $PREV = @(--src-type|--dst-type) ]]; then
             WORDS="UNSPEC UNICAST LOCAL BROADCAST ANYCAST MULTICAST BLACKHOLE
             UNREACHABLE PROHIBIT THROW NAT XRESOLVE"
 
-        elif [[ $LVAL = connbytes ]]; then
+        elif [[ $LVAL == connbytes ]]; then
             case $PREV in
                 --connbytes-dir) WORDS="original reply both" ;;
                 --connbytes-mode) WORDS="packets bytes avgpkt" ;;
             esac
 
-        elif [[ $LVAL = conntrack ]]; then
+        elif [[ $LVAL == conntrack ]]; then
             case $LPRE in
                 --ctstate) WORDS="INVALID NEW ESTABLISHED RELATED UNTRACKED SNAT DNAT" ;;
                 --ctstatus) WORDS="NONE EXPECTED SEEN_REPLY ASSURED CONFIRMED" ;;
             esac
 
-        elif [[ $LVAL = dccp && $PREV = --dccp-types ]]; then
+        elif [[ $LVAL == dccp && $PREV = --dccp-types ]]; then
             WORDS="REQUEST RESPONSE DATA ACK DATAACK CLOSEREQ CLOSE RESET SYNC SYNCACK INVALID"
 
-        elif [[ $LVAL = hashlimit && $LPRE = --hashlimit-mode ]]; then
+        elif [[ $LVAL == hashlimit && $LPRE = --hashlimit-mode ]]; then
             WORDS="srcip srcport dstip dstport"
         
-        elif [[ $LVAL = @(icmp|all|0) && $PREV = --icmp-type ]]; then
+        elif [[ $LVAL == @(icmp|all|0) && $PREV = --icmp-type ]]; then
             WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
-        elif [[ $LVAL = @(icmp6|all|0) && $PREV = --icmpv6-type ]]; then
+        elif [[ $LVAL == @(icmp6|all|0) && $PREV = --icmpv6-type ]]; then
             WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid ICMPv6 Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
         
-        elif [[ $LVAL = @(mh|all|0) && $PREV = --mh-type ]]; then
+        elif [[ $LVAL == @(mh|all|0) && $PREV = --mh-type ]]; then
             WORDS=$(sudo $CMD -p mh -h | sed -En '/^Valid MH Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
-        elif [[ $LVAL = ipv6header && $LPRE = --header ]]; then
+        elif [[ $LVAL == ipv6header && $LPRE = --header ]]; then
             WORDS="hop hop-by-hop dst route frag auth esp none prot"
         
-        elif [[ $LVAL = ipvs ]]; then
+        elif [[ $LVAL == ipvs ]]; then
             case $PREV in
                 --vdir) WORDS="ORIGINAL REPLY" ;;
                 --vmethod) WORDS="GATE IPIP MASQ" ;;
             esac
 
-        elif [[ $LVAL = pkttype && $PREV = --pkt-type ]]; then
+        elif [[ $LVAL == pkttype && $PREV == --pkt-type ]]; then
             WORDS="unicast broadcast multicast"
 
-        elif [[ $LVAL = policy ]]; then
+        elif [[ $LVAL == policy ]]; then
             case $PREV in
                 --dir) WORDS="in out" ;;
                 --pol) WORDS="none ipsec" ;;
@@ -187,54 +187,54 @@ _iptables_argument()
                 --mode) WORDS="tunnel transport" ;;
             esac
 
-        elif [[ $LVAL = @(tcp|all|0) && $LPRE = --tcp-flags ]]; then
+        elif [[ $LVAL == @(tcp|all|0) && $LPRE == --tcp-flags ]]; then
             WORDS="SYN ACK FIN RST URG PSH ALL NONE"
 
-        elif [[ $LVAL = @(sctp|all|0) ]]; then
-            if [[ $PREV = --chunk-types ]]; then
+        elif [[ $LVAL == @(sctp|all|0) ]]; then
+            if [[ $PREV == --chunk-types ]]; then
                 WORDS="all any only"
-            elif [[ $PREV = DATA && ${COMP_WORDS[COMP_CWORD]} = ":" ]]; then
+            elif [[ $PREV == DATA && ${COMP_WORDS[COMP_CWORD]} == ":" ]]; then
                 WORDS="I U B E i u b e"
-            elif [[ $PREV = @(ABORT|SHUTDOWN_COMPLETE) && ${COMP_WORDS[COMP_CWORD]} = ":" ]]; then
+            elif [[ $PREV == @(ABORT|SHUTDOWN_COMPLETE) && ${COMP_WORDS[COMP_CWORD]} == ":" ]]; then
                 WORDS="T t ."
-            elif [[ $LPRE = --chunk-types ]]; then
+            elif [[ $LPRE == --chunk-types ]]; then
                 WORDS="DATA INIT INIT_ACK SACK HEARTBEAT HEARTBEAT_ACK ABORT SHUTDOWN
                     SHUTDOWN_ACK ERROR COOKIE_ECHO COOKIE_ACK ECN_ECNE  ECN_CWR
                     SHUTDOWN_COMPLETE ASCONF ASCONF_ACK FORWARD_TSN"
             fi
         
-        elif [[ $LVAL = state && $LPRE = --state ]]; then
+        elif [[ $LVAL == state && $LPRE == --state ]]; then
             WORDS="INVALID ESTABLISHED NEW RELATED UNTRACKED"
 
-        elif [[ $LVAL = statistic && $PREV = --mode ]]; then
+        elif [[ $LVAL == statistic && $PREV == --mode ]]; then
             WORDS="random nth"
 
-        elif [[ $LVAL = string && $PREV = --algo ]]; then
+        elif [[ $LVAL == string && $PREV == --algo ]]; then
             WORDS="bm kmp"
         
-        elif [[ $LVAL = time && $LPRE = --weekdays ]]; then
+        elif [[ $LVAL == time && $LPRE == --weekdays ]]; then
             WORDS="Mon Tue Wed Thu Fri Sat Sun"
         fi
         
-    elif [[ $LOPT = @(-j|--jump) ]]; then
+    elif [[ $LOPT == @(-j|--jump) ]]; then
 
-        if [[ $LVAL = AUDIT && $PREV = --type ]]; then
+        if [[ $LVAL == AUDIT && $PREV == --type ]]; then
             WORDS="accept drop reject"
         
-        elif [[ $LVAL = CLUSTERIP && $PREV = --hashmode ]]; then
+        elif [[ $LVAL == CLUSTERIP && $PREV == --hashmode ]]; then
             WORDS="sourceip  sourceip-sourceport sourceip-sourceport-destport"
 
-        elif [[ $LVAL = CT && $LPRE = --ctevents ]]; then
+        elif [[ $LVAL == CT && $LPRE == --ctevents ]]; then
             WORDS="new related destroy reply assured protoinfo helper mark natseqinfo secmark"
 
-        elif [[ $LVAL = HMARK && $LPRE = --hmark-tuple ]]; then
+        elif [[ $LVAL == HMARK && $LPRE == --hmark-tuple ]]; then
             WORDS="src dst sport dport spi ct"
         
-        elif [[ $LVAL = LOG && $PREV = --log-level ]]; then
+        elif [[ $LVAL == LOG && $PREV == --log-level ]]; then
             WORDS="emerg alert crit error warning notice info debug"
 
-        elif [[ $LVAL = REJECT && $PREV = --reject-with ]]; then
-            if [[ $CMD = ip6tables ]]; then
+        elif [[ $LVAL == REJECT && $PREV == --reject-with ]]; then
+            if [[ $CMD == ip6tables ]]; then
             WORDS="icmp6-no-route no-route icmp6-adm-prohibited tcp-reset
                 adm-prohibited icmp6-addr-unreachable addr-unreach icmp6-port-unreachable"
             else
@@ -243,7 +243,7 @@ _iptables_argument()
                 icmp-admin-prohibited tcp-reset"
             fi
 
-        elif [[ $LVAL = TCPOPTSTRIP && $LPRE = --strip-options ]]; then
+        elif [[ $LVAL == TCPOPTSTRIP && $LPRE == --strip-options ]]; then
             WORDS="wscale mss sack-permitted sack timestamp md5"
         fi
     fi
@@ -256,13 +256,13 @@ _iptables_match()
     ipvs length limit mark multiport nfacct osf physdev pkttype policy 
     quota rateest recent sctp set socket state statistic string tcp 
     tcpmss time tos u32 udp"
-    [[ $CHAIN = @(PREROUTING|INPUT|FORWARD) ]] && WORDS+=" mac"
-    [[ $CHAIN = @(POSTROUTING|OUTPUT) ]] && WORDS+=" owner"
-    [[ $TABLE = @(raw|mangle) && $CHAIN = PREROUTING ]] && WORDS+=" rpfilter"
-    [[ $CMD = iptables ]] && WORDS+=" icmp realm ttl"
-    if [[ $CMD = ip6tables ]]; then
+    [[ $CHAIN == @(PREROUTING|INPUT|FORWARD) ]] && WORDS+=" mac"
+    [[ $CHAIN == @(POSTROUTING|OUTPUT) ]] && WORDS+=" owner"
+    [[ $TABLE == @(raw|mangle) && $CHAIN == PREROUTING ]] && WORDS+=" rpfilter"
+    [[ $CMD == iptables ]] && WORDS+=" icmp realm ttl"
+    if [[ $CMD == ip6tables ]]; then
         WORDS+=" dst frag hbh hl icmp6 ipv6header mh rt"
-        [[ $CHAIN = @(PREROUTING|INPUT|FORWARD) ]] && WORDS+=" eui64"
+        [[ $CHAIN == @(PREROUTING|INPUT|FORWARD) ]] && WORDS+=" eui64"
     fi
 }
 _iptables_target()
@@ -271,18 +271,18 @@ _iptables_target()
     WORDS="ACCEPT DROP RETURN"
     WORDS+=" AUDIT CLASSIFY CONNMARK HMARK IDLETIMER LED LOG MARK NFLOG 
             NFQUEUE RATEEST SET SYNPROXY TCPMSS TCPOPTSTRIP TEE"
-    [[ $CMD = iptables ]] && WORDS+=" CLUSTERIP ULOG"
-    [[ $CHAIN = @(INPUT|OUTPUT|FORWARD|USER_DEFINED) ]] && WORDS+=" REJECT"
+    [[ $CMD == iptables ]] && WORDS+=" CLUSTERIP ULOG"
+    [[ $CHAIN == @(INPUT|OUTPUT|FORWARD|USER_DEFINED) ]] && WORDS+=" REJECT"
     case $TABLE in
         raw) WORDS+=" CT NOTRACK TRACE" ;;
         nat) WORDS+=" NETMAP"
-            [[ $CHAIN = @(PREROUTING|OUTPUT|USER_DEFINED) ]] && WORDS+=" DNAT REDIRECT"
-            [[ $CHAIN = @(POSTROUTING|INPUT|USER_DEFINED) ]] && WORDS+=" SNAT"
-            [[ $CHAIN = POSTROUTING ]] && WORDS+=" MASQUERADE" ;;
+            [[ $CHAIN == @(PREROUTING|OUTPUT|USER_DEFINED) ]] && WORDS+=" DNAT REDIRECT"
+            [[ $CHAIN == @(POSTROUTING|INPUT|USER_DEFINED) ]] && WORDS+=" SNAT"
+            [[ $CHAIN == POSTROUTING ]] && WORDS+=" MASQUERADE" ;;
         mangle) WORDS+=" CHECKSUM CONNSECMARK SECMARK DSCP TOS" 
-            [[ $CMD = iptables ]] && WORDS+=" ECN TTL"
-            [[ $CMD = ip6tables ]] && WORDS+=" DNPT SNPT HL"
-            [[ $CHAIN = @(PREROUTING|USER_DEFINED) ]] && WORDS+=" TPROXY" ;;
+            [[ $CMD == iptables ]] && WORDS+=" ECN TTL"
+            [[ $CMD == ip6tables ]] && WORDS+=" DNPT SNPT HL"
+            [[ $CHAIN == @(PREROUTING|USER_DEFINED) ]] && WORDS+=" TPROXY" ;;
         security) WORDS+=" CONNSECMARK SECMARK" ;;
     esac
     WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
@@ -293,10 +293,10 @@ _iptables_check()
     for arg1 in "$@"; do
         for arg2 in "${COMP_WORDS[@]}"; do
             [[ ${arg2:0:1} != "-" ]] && continue
-            if [[ ${arg2:0:2} = "--" ]]; then 
-                [[ $arg2 = $arg1 ]] && return
+            if [[ ${arg2:0:2} == "--" ]]; then 
+                [[ $arg2 == $arg1 ]] && return
             else
-                [[ ${arg1:0:2} = "--" ]] && continue
+                [[ ${arg1:0:2} == "--" ]] && continue
                 [[ $arg2 =~ ${arg1:1} ]] && return
             fi
         done
@@ -318,14 +318,14 @@ _iptables_number()
                 printf "%0*d) %s\n", len, j+1, a[j]
     }}')
     IFS=$'\n' COMPREPLY=( $WORDS )
-    [[ ${#COMPREPLY[@]} = 1 ]] && COMPREPLY+=( "2) __END__" )
+    [[ ${#COMPREPLY[@]} == 1 ]] && COMPREPLY+=( "2) __END__" )
 }
 _iptables() 
 {
     if ! [[ $PROMPT_COMMAND =~ "COMP_WORDBREAKS=" ]]; then
         PROMPT_COMMAND="COMP_WORDBREAKS=${COMP_WORDBREAKS@Q}; "$PROMPT_COMMAND
     fi
-    ! [[ $COMP_WORDBREAKS = *,* ]] && COMP_WORDBREAKS+=","
+    ! [[ $COMP_WORDBREAKS == *,* ]] && COMP_WORDBREAKS+=","
 
     local CMD=$1 CUR=$2 PREV=$3 PREV2=${COMP_WORDS[COMP_CWORD-2]}
     local IFS=$' \t\n' WORDS 
@@ -337,24 +337,24 @@ _iptables()
         CHAIN=USER_DEFINED
     fi
 
-    if [[ ${CUR:0:1} = "-" ]]; then
+    if [[ ${CUR:0:1} == "-" ]]; then
         WORDS=$( _iptables_check -t --table )
         WORDS+=" "$( _iptables_check -A --append -C --check -D --delete \
         -I --insert -R --replace -L --list -S --list-rules -F --flush -Z --zero \
         -N --new-chain -X --delete-chain -P --policy -E --rename-chain )
-        if [[ ${WORDS%%*( )} = "" || ${WORDS%%*( )} = "-t --table" ]]; then
+        if [[ ${WORDS%%*( )} == "" || ${WORDS%%*( )} == "-t --table" ]]; then
             WORDS+=" -p --protocol -s --source -d --destination -m --match -j --jump
             -g --goto -i --in-interface -o --out-interface -c --set-counters"
-            [[ $CMD = iptables ]] && WORDS+=" -f --fragment"
+            [[ $CMD == iptables ]] && WORDS+=" -f --fragment"
         fi
         WORDS+=" -h -v --verbose -w --wait -W --wait-interval -n --numeric -x --exact 
         --line-numbers --modprobe="
     fi
 
-    if [[ $PREV = @(-!(-*)t|--table) && ${CUR:0:1} != "-" ]]; then
+    if [[ $PREV == @(-!(-*)t|--table) && ${CUR:0:1} != "-" ]]; then
         WORDS="filter nat mangle raw security"
 
-    elif [[ $PREV = @(-!(-*)[ACDIRLSFZNXPEg]|--append|--check|--delete|--insert|\
+    elif [[ $PREV == @(-!(-*)[ACDIRLSFZNXPEg]|--append|--check|--delete|--insert|\
 --replace|--list|--list-rules|--flush|--zero|--new-chain|--delete-chain|--policy|\
 --rename-chain|--goto) && ${CUR:0:1} != "-" ]]; then
 
@@ -371,32 +371,32 @@ _iptables()
             WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
         fi
 
-    elif [[ $PREV = @(-!(-*)[io]|--in-interface|--out-interface|--rateest1|--rateest2|\
+    elif [[ $PREV == @(-!(-*)[io]|--in-interface|--out-interface|--rateest1|--rateest2|\
 --rateest-name) && ${CUR:0:1} != "-" ]]; then
         WORDS=$( \ls /sys/class/net/ )
 
-    elif [[ $PREV = @(-!(-*)p|--protocol) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV == @(-!(-*)p|--protocol) && ${CUR:0:1} != "-" ]]; then
         WORDS="tcp udp udplite esp ah sctp all"
-        [[ $CMD = iptables ]] && WORDS+=" icmp"
-        [[ $CMD = ip6tables ]] && WORDS+=" icmp6 mh"
+        [[ $CMD == iptables ]] && WORDS+=" icmp"
+        [[ $CMD == ip6tables ]] && WORDS+=" icmp6 mh"
     
-    elif [[ $PREV2 = @(-!(-*)P|--policy) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV2 == @(-!(-*)P|--policy) && ${CUR:0:1} != "-" ]]; then
         WORDS="ACCEPT DROP"
 
-    elif [[ $PREV = @(-!(-*)j|--jump) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV == @(-!(-*)j|--jump) && ${CUR:0:1} != "-" ]]; then
         _iptables_target
 
-    elif [[ $PREV = @(-!(-*)m|--match) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV == @(-!(-*)m|--match) && ${CUR:0:1} != "-" ]]; then
         _iptables_match
 
-    elif [[ $PREV2 = @(-!(-*)[DCR]|--delete|--check|--replace) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV2 == @(-!(-*)[DCR]|--delete|--check|--replace) && ${CUR:0:1} != "-" ]]; then
         _iptables_number $TABLE $PREV
         return
 
     else
         local LOPT LVAL LPRE
         local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
-        if [[ ${CUR:0:1} = "-" ]]; then
+        if [[ ${CUR:0:1} == "-" ]]; then
             [[ $COMP_LINE2 =~ .*" "(-p|--protocol)" "+([[:alnum:]]+)" " ]]
             LOPT=${BASH_REMATCH[1]:--p}
             LVAL=${BASH_REMATCH[2]:-all}
@@ -407,7 +407,7 @@ _iptables()
         LVAL=${BASH_REMATCH[2]}
         [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
         LPRE=${BASH_REMATCH[1]}
-        if [[ ${CUR:0:1} = "-" && $LOPT != @(-p|--protocol) ]]; then
+        if [[ ${CUR:0:1} == "-" && $LOPT != @(-p|--protocol) ]]; then
             _iptables_option
         else
             _iptables_argument
