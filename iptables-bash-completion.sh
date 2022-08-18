@@ -316,9 +316,9 @@ _iptables_number()
             len = length(i)
             for (j in a) 
                 printf "%0*d) %s\n", len, j+1, a[j]
+            if (length(a) == 1) print " "
     }}')
     IFS=$'\n' COMPREPLY=( $WORDS )
-    [[ ${#COMPREPLY[@]} == 1 ]] && COMPREPLY+=( "2) __END__" )
 }
 _iptables() 
 {
