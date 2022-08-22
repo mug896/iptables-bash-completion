@@ -197,9 +197,9 @@ _iptables_argument()
         elif [[ $LVAL == @(sctp|all|0) ]]; then
             if [[ $PREV == --chunk-types ]]; then
                 WORDS="all any only"
-            elif [[ $PREV == DATA && ${COMP_WORDS[COMP_CWORD]} == ":" ]]; then
+            elif [[ $PREV == DATA && $CUR == ":" ]]; then
                 WORDS="I U B E i u b e"
-            elif [[ $PREV == @(ABORT|SHUTDOWN_COMPLETE) && ${COMP_WORDS[COMP_CWORD]} == ":" ]]; then
+            elif [[ $PREV == @(ABORT|SHUTDOWN_COMPLETE) && $CUR == ":" ]]; then
                 WORDS="T t ."
             elif [[ $LPRE == --chunk-types ]]; then
                 WORDS="DATA INIT INIT_ACK SACK HEARTBEAT HEARTBEAT_ACK ABORT SHUTDOWN
@@ -337,7 +337,7 @@ _iptables()
     fi
     ! [[ $COMP_WORDBREAKS == *,* ]] && COMP_WORDBREAKS+=","
 
-    local CMD=$1 CUR=$2 PREV=$3 PREV2=${COMP_WORDS[COMP_CWORD-2]}
+    local CMD=$1 CUR=${COMP_WORDS[COMP_CWORD]} PREV=$3 PREV2=${COMP_WORDS[COMP_CWORD-2]}
     local IFS=$' \t\n' WORDS 
     [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
     local TABLE=${BASH_REMATCH[2]:-filter}
