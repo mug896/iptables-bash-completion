@@ -151,12 +151,14 @@ _iptables_argument()
                 --ctstate) WORDS="INVALID NEW ESTABLISHED RELATED UNTRACKED SNAT DNAT" ;;
                 --ctstatus) WORDS="NONE EXPECTED SEEN_REPLY ASSURED CONFIRMED" ;;
             esac
+            [[ $CUR = "," ]] && CUR=""
 
         elif [[ $LVAL == dccp && $PREV = --dccp-types ]]; then
             WORDS="REQUEST RESPONSE DATA ACK DATAACK CLOSEREQ CLOSE RESET SYNC SYNCACK INVALID"
 
         elif [[ $LVAL == hashlimit && $LPRE = --hashlimit-mode ]]; then
             WORDS="srcip srcport dstip dstport"
+            [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL == @(icmp|all|0) && $PREV = --icmp-type ]]; then
             WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
@@ -169,6 +171,7 @@ _iptables_argument()
 
         elif [[ $LVAL == ipv6header && $LPRE = --header ]]; then
             WORDS="hop hop-by-hop dst route frag auth esp none prot"
+            [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL == ipvs ]]; then
             case $PREV in
@@ -189,6 +192,7 @@ _iptables_argument()
 
         elif [[ $LVAL == @(tcp|all|0) && $LPRE == --tcp-flags ]]; then
             WORDS="SYN ACK FIN RST URG PSH ALL NONE"
+            [[ $CUR = "," ]] && CUR=""
 
         elif [[ $LVAL == @(sctp|all|0) ]]; then
             if [[ $PREV == --chunk-types ]]; then
@@ -202,9 +206,11 @@ _iptables_argument()
                     SHUTDOWN_ACK ERROR COOKIE_ECHO COOKIE_ACK ECN_ECNE  ECN_CWR
                     SHUTDOWN_COMPLETE ASCONF ASCONF_ACK FORWARD_TSN"
             fi
+            [[ $CUR = @(,|:) ]] && CUR=""
         
         elif [[ $LVAL == state && $LPRE == --state ]]; then
             WORDS="INVALID ESTABLISHED NEW RELATED UNTRACKED"
+            [[ $CUR = "," ]] && CUR=""
 
         elif [[ $LVAL == statistic && $PREV == --mode ]]; then
             WORDS="random nth"
@@ -214,6 +220,7 @@ _iptables_argument()
         
         elif [[ $LVAL == time && $LPRE == --weekdays ]]; then
             WORDS="Mon Tue Wed Thu Fri Sat Sun"
+            [[ $CUR = "," ]] && CUR=""
         fi
         
     elif [[ $LOPT == @(-j|--jump) ]]; then
@@ -226,9 +233,11 @@ _iptables_argument()
 
         elif [[ $LVAL == CT && $LPRE == --ctevents ]]; then
             WORDS="new related destroy reply assured protoinfo helper mark natseqinfo secmark"
+            [[ $CUR = "," ]] && CUR=""
 
         elif [[ $LVAL == HMARK && $LPRE == --hmark-tuple ]]; then
             WORDS="src dst sport dport spi ct"
+            [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL == LOG && $PREV == --log-level ]]; then
             WORDS="emerg alert crit error warning notice info debug"
@@ -245,6 +254,7 @@ _iptables_argument()
 
         elif [[ $LVAL == TCPOPTSTRIP && $LPRE == --strip-options ]]; then
             WORDS="wscale mss sack-permitted sack timestamp md5"
+            [[ $CUR = "," ]] && CUR=""
         fi
     fi
 }
