@@ -338,8 +338,7 @@ _iptables()
     ! [[ $COMP_WORDBREAKS == *,* ]] && COMP_WORDBREAKS+=","
 
     local CMD=$1 CUR=${COMP_WORDS[COMP_CWORD]} PREV=$3 PREV2=${COMP_WORDS[COMP_CWORD-2]}
-    local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
-    [[ ${COMP_LINE2: -1} = " " && -n $CUR ]] && CUR=""
+    [[ ${COMP_LINE:COMP_POINT-1:1} = " " ]] && CUR=""
     local IFS=$' \t\n' WORDS 
     [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
     local TABLE=${BASH_REMATCH[2]:-filter}
@@ -407,6 +406,7 @@ _iptables()
 
     else
         local LOPT LVAL LPRE
+        local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
         if [[ ${CUR:0:1} == "-" ]]; then
             [[ $COMP_LINE2 =~ .*" "(-p|--protocol)" "+([[:alnum:]]+)" " ]]
             LOPT=${BASH_REMATCH[1]:--p}
