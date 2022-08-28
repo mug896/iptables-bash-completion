@@ -332,7 +332,7 @@ _iptables_number()
 }
 _iptables() 
 {
-    if ! [[ $PROMPT_COMMAND =~ "COMP_WORDBREAKS=" ]]; then
+    if ! [[ $PROMPT_COMMAND == *"COMP_WORDBREAKS="* ]]; then
         PROMPT_COMMAND="COMP_WORDBREAKS=${COMP_WORDBREAKS@Q}; "$PROMPT_COMMAND
     fi
     ! [[ $COMP_WORDBREAKS == *,* ]] && COMP_WORDBREAKS+=","
