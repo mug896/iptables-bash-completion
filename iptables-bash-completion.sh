@@ -351,7 +351,7 @@ _iptables()
         CHAIN=USER_DEFINED
     fi
 
-    if [[ ${CUR:0:1} == "-" ]]; then
+    if [[ $CUR == -* ]]; then
         WORDS=$( _iptables_check -t --table )
         WORDS+=" "$( _iptables_check -A --append -C --check -D --delete \
         -I --insert -R --replace -L --list -S --list-rules -F --flush -Z --zero \
@@ -365,12 +365,12 @@ _iptables()
         --line-numbers --modprobe="
     fi
 
-    if [[ $PREV == @(-!(-*)t|--table) && ${CUR:0:1} != "-" ]]; then
+    if [[ $PREV == @(-!(-*)t|--table) && $CUR != -* ]]; then
         WORDS="filter nat mangle raw security"
 
     elif [[ $PREV == @(-!(-*)[ACDIRLSFZNXPEg]|--append|--check|--delete|--insert|\
 --replace|--list|--list-rules|--flush|--zero|--new-chain|--delete-chain|--policy|\
---rename-chain|--goto) && ${CUR:0:1} != "-" ]]; then
+--rename-chain|--goto) && $CUR != -* ]]; then
 
         if [[ $PREV != @(-E|--rename-chain|-N|--new-chain) ]]; then
             case $TABLE in
@@ -386,31 +386,31 @@ _iptables()
         fi
 
     elif [[ $PREV == @(-!(-*)[io]|--in-interface|--out-interface|--rateest1|--rateest2|\
---rateest-name) && ${CUR:0:1} != "-" ]]; then
+--rateest-name) && $CUR != -* ]]; then
         WORDS=$( \ls /sys/class/net/ )
 
-    elif [[ $PREV == @(-!(-*)p|--protocol) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV == @(-!(-*)p|--protocol) && $CUR != -* ]]; then
         WORDS="tcp udp udplite esp ah sctp all"
         [[ $CMD == iptables ]] && WORDS+=" icmp"
         [[ $CMD == ip6tables ]] && WORDS+=" icmp6 mh"
     
-    elif [[ $PREV2 == @(-!(-*)P|--policy) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV2 == @(-!(-*)P|--policy) && $CUR != -* ]]; then
         WORDS="ACCEPT DROP"
 
-    elif [[ $PREV == @(-!(-*)j|--jump) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV == @(-!(-*)j|--jump) && $CUR != -* ]]; then
         _iptables_target
 
-    elif [[ $PREV == @(-!(-*)m|--match) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV == @(-!(-*)m|--match) && $CUR != -* ]]; then
         _iptables_match
 
-    elif [[ $PREV2 == @(-!(-*)[DCR]|--delete|--check|--replace) && ${CUR:0:1} != "-" ]]; then
+    elif [[ $PREV2 == @(-!(-*)[DCR]|--delete|--check|--replace) && $CUR != -* ]]; then
         _iptables_number $TABLE $PREV
         return
 
     else
         local LOPT LVAL LPRE
         local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
-        if [[ ${CUR:0:1} == "-" ]]; then
+        if [[ $CUR == -* ]]; then
             [[ $COMP_LINE2 =~ .*" "(-p|--protocol)" "+([[:alnum:]]+)" " ]]
             LOPT=${BASH_REMATCH[1]:--p}
             LVAL=${BASH_REMATCH[2]:-all}
@@ -421,7 +421,7 @@ _iptables()
         LVAL=${BASH_REMATCH[2]}
         [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
         LPRE=${BASH_REMATCH[1]}
-        if [[ ${CUR:0:1} == "-" && $LOPT != @(-p|--protocol) ]]; then
+        if [[ $CUR == -* && $LOPT != @(-p|--protocol) ]]; then
             _iptables_option
         else
             _iptables_argument
