@@ -330,7 +330,7 @@ _iptables_number()
     }}')
     IFS=$'\n' COMPREPLY=( $WORDS )
 }
-_init_WORDBREAKS()
+_init_comp_wordbreaks()
 {
     if [[ $PROMPT_COMMAND == *"COMP_WORDBREAKS="* ]]; then
         [[ $PROMPT_COMMAND =~ ^:\ ([^;]*)\; ]]
@@ -344,9 +344,9 @@ _init_WORDBREAKS()
 }
 _iptables() 
 {
-    # It is recommended that every completion functions start with _init_WORDBREAKS, 
+    # It is recommended that every completion functions start with _init_comp_wordbreaks,
     # whether or not they change the COMP_WORDBREAKS variable afterward.
-    _init_WORDBREAKS
+    _init_comp_wordbreaks
     ! [[ $COMP_WORDBREAKS == *,* ]] && COMP_WORDBREAKS+=","
 
     local CMD=$1 CUR=${COMP_WORDS[COMP_CWORD]}
