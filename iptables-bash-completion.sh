@@ -330,13 +330,21 @@ _iptables_number()
     }}')
     IFS=$'\n' COMPREPLY=( $WORDS )
 }
-_iptables() 
+_init_WORDBREAKS ()
 {
+    if [[ $PROMPT_COMMAND == *"COMP_WORDBREAKS="* ]]; then
+        [[ $PROMPT_COMMAND =~ ^:\ ([^;]*)\; ]]
+        [[ ${BASH_REMATCH[1]} != ${COMP_WORDS[0]} ]] && PROMPT_COMMAND=$_PROMPT_COMMAND_BAK
+    fi
     if ! [[ $PROMPT_COMMAND == *"COMP_WORDBREAKS="* ]]; then
         _PROMPT_COMMAND_BAK=${PROMPT_COMMAND%;*( )}
-        PROMPT_COMMAND="COMP_WORDBREAKS=${COMP_WORDBREAKS@Q}; "
+        PROMPT_COMMAND=": ${COMP_WORDS[0]}; COMP_WORDBREAKS=${COMP_WORDBREAKS@Q}; "
         PROMPT_COMMAND+=$_PROMPT_COMMAND_BAK'; PROMPT_COMMAND=$_PROMPT_COMMAND_BAK'
     fi
+}
+_iptables() 
+{
+    _init_WORDBREAKS
     ! [[ $COMP_WORDBREAKS == *,* ]] && COMP_WORDBREAKS+=","
 
     local CMD=$1 CUR=${COMP_WORDS[COMP_CWORD]}
