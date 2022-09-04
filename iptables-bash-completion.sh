@@ -333,7 +333,7 @@ _iptables_number()
 _init_comp_wordbreaks()
 {
     if [[ $PROMPT_COMMAND == *"COMP_WORDBREAKS="* ]]; then
-        [[ $PROMPT_COMMAND =~ ^:\ ([^;]*)\; ]]
+        [[ $PROMPT_COMMAND =~ ^:\ ([^;]+)\; ]]
         [[ ${BASH_REMATCH[1]} != ${COMP_WORDS[0]} ]] && eval "${PROMPT_COMMAND%%$'\a'*}"
     fi
     if [[ $PROMPT_COMMAND != *"COMP_WORDBREAKS="* ]]; then
