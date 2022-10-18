@@ -381,7 +381,7 @@ _iptables()
 --replace|--list|--list-rules|--flush|--zero|--new-chain|--delete-chain|--policy|\
 --rename-chain|--goto) && $CUR != -* ]]; then
 
-        if [[ $PREV != @(-E|--rename-chain|-N|--new-chain) ]]; then
+        if [[ $PREV != @(-E|--rename-chain|-N|--new-chain|-X|--delete) ]]; then
             case $TABLE in
                 raw) WORDS="PREROUTING OUTPUT" ;;
                 nat) WORDS="PREROUTING INPUT OUTPUT POSTROUTING" ;;
