@@ -412,7 +412,7 @@ _iptables()
     elif [[ $PREV == @(-!(-*)m|--match) && $CUR != -* ]]; then
         _iptables_match
 
-    elif [[ $PREV2 == @(-!(-*)[DCRI]|--delete|--check|--replace|--insert) && $CUR != -* ]]; then
+    elif [[ $PREV2 == @(-!(-*)[DCRIZ]|--delete|--check|--replace|--insert|--zero) && $CUR != -* ]]; then
         _iptables_number $TABLE $PREV
         return
 
