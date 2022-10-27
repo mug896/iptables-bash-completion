@@ -381,7 +381,7 @@ _iptables()
 --replace|--list|--list-rules|--flush|--zero|--new-chain|--delete-chain|--policy|\
 --rename-chain|--goto) && $CUR != -* ]]; then
 
-        if [[ $PREV != @(-E|--rename-chain|-N|--new-chain|-X|--delete-chain) ]]; then
+        if [[ $PREV != @(-!(-*)[ENX]|--rename-chain|--new-chain|--delete-chain) ]]; then
             case $TABLE in
                 raw) WORDS="PREROUTING OUTPUT" ;;
                 nat) WORDS="PREROUTING INPUT OUTPUT POSTROUTING" ;;
@@ -390,7 +390,7 @@ _iptables()
                 *) WORDS="INPUT FORWARD OUTPUT" ;;             # filter table
             esac
         fi
-        if [[ $PREV != @(-P|--policy) ]]; then
+        if [[ $PREV != @(-!(-*)P|--policy) ]]; then
             WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
         fi
 
@@ -420,17 +420,17 @@ _iptables()
         local LOPT LVAL LPRE
         local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
         if [[ $CUR == -* ]]; then
-            [[ $COMP_LINE2 =~ .*" "(-p|--protocol)" "+([[:alnum:]]+)" " ]]
+            [[ $COMP_LINE2 =~ .*" "(-!(-*)p|--protocol)" "+([[:alnum:]]+)" " ]]
             LOPT=${BASH_REMATCH[1]:--p}
             LVAL=${BASH_REMATCH[2]:-all}
             _iptables_option
         fi
-        [[ $COMP_LINE2 =~ .*" "(-p|--protocol|-m|--match|-j|--jump)" "+([[:alnum:]]+)" " ]]
+        [[ $COMP_LINE2 =~ .*" "(-!(-*)[pmj]|--protocol|--match|--jump)" "+([[:alnum:]]+)" " ]]
         LOPT=${BASH_REMATCH[1]}
         LVAL=${BASH_REMATCH[2]}
         [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
         LPRE=${BASH_REMATCH[1]}
-        if [[ $CUR == -* && $LOPT != @(-p|--protocol) ]]; then
+        if [[ $CUR == -* && $LOPT != @(-!(-*)p|--protocol) ]]; then
             _iptables_option
         else
             _iptables_argument
