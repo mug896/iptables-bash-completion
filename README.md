@@ -6,8 +6,8 @@ open new terminal and try auto completion !
 
 ```sh
 bash$ hostnamectl
-Operating System: Ubuntu 22.10                    
-          Kernel: Linux 5.19.0-23-generic
+Operating System: Ubuntu 22.04.1 LTS
+          Kernel: Linux 5.15.0-43-generic
     Architecture: x86-64
 
 bash$ iptables -v
