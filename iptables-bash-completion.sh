@@ -352,9 +352,9 @@ _iptables()
     [[ ${COMP_LINE:COMP_POINT-1:1} = " " ]] && CUR=""
     local PREV=${COMP_WORDS[COMP_CWORD-1]} PREV2=${COMP_WORDS[COMP_CWORD-2]}
     local IFS=$' \t\n' WORDS 
-    [[ $COMP_LINE =~ .*" "(-t|--table)" "+([[:alnum:]]+) ]]
+    [[ $COMP_LINE =~ .*" "(-!(-*)t|--table)" "+([[:alnum:]]+) ]]
     local TABLE=${BASH_REMATCH[2]:-filter}
-    [[ $COMP_LINE =~ .*" "(-A|--append|-I|--insert|-R|--replace)" "+([[:alnum:]]+) ]]
+    [[ $COMP_LINE =~ .*" "(-!(-*)[AIR]|--append|--insert|--replace)" "+([[:alnum:]]+) ]]
     local CHAIN=${BASH_REMATCH[2]}
     if [[ -n $CHAIN && $CHAIN != @(PREROUTING|INPUT|OUTPUT|FORWARD|POSTROUTING) ]]; then
         CHAIN=USER_DEFINED
