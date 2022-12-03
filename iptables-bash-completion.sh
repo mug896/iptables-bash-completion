@@ -352,9 +352,9 @@ _iptables()
     [[ ${COMP_LINE:COMP_POINT-1:1} = " " ]] && CUR=""
     local PREV=${COMP_WORDS[COMP_CWORD-1]} PREV2=${COMP_WORDS[COMP_CWORD-2]}
     local IFS=$' \t\n' WORDS 
-    [[ $COMP_LINE =~ .*" "(-!(-*)t|--table)" "+([[:alnum:]]+) ]]
+    [[ $COMP_LINE =~ .*" "(-[[:alpha:]]*t|--table)" "+([[:alnum:]]+) ]]
     local TABLE=${BASH_REMATCH[2]:-filter}
-    [[ $COMP_LINE =~ .*" "(-!(-*)[AIR]|--append|--insert|--replace)" "+([[:alnum:]]+) ]]
+    [[ $COMP_LINE =~ .*" "(-[[:alpha:]]*[AIR]|--append|--insert|--replace)" "+([[:alnum:]]+) ]]
     local CHAIN=${BASH_REMATCH[2]}
     if [[ -n $CHAIN && $CHAIN != @(PREROUTING|INPUT|OUTPUT|FORWARD|POSTROUTING) ]]; then
         CHAIN=USER_DEFINED
@@ -420,12 +420,12 @@ _iptables()
         local LOPT LVAL LPRE
         local COMP_LINE2=${COMP_LINE:0:$COMP_POINT}
         if [[ $CUR == -* ]]; then
-            [[ $COMP_LINE2 =~ .*" "(-!(-*)p|--protocol)" "+([[:alnum:]]+)" " ]]
+            [[ $COMP_LINE2 =~ .*" "(-[[:alpha:]]*p|--protocol)" "+([[:alnum:]]+)" " ]]
             LOPT=${BASH_REMATCH[1]:--p}
             LVAL=${BASH_REMATCH[2]:-all}
             _iptables_option
         fi
-        [[ $COMP_LINE2 =~ .*" "(-!(-*)[pmj]|--protocol|--match|--jump)" "+([[:alnum:]]+)" " ]]
+        [[ $COMP_LINE2 =~ .*" "(-[[:alpha:]]*[pmj]|--protocol|--match|--jump)" "+([[:alnum:]]+)" " ]]
         LOPT=${BASH_REMATCH[1]}
         LVAL=${BASH_REMATCH[2]}
         [[ $COMP_LINE2 =~ .*" "(--[[:alnum:]-]+)" " ]]
