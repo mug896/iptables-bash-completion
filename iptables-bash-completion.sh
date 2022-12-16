@@ -161,13 +161,13 @@ _iptables_argument()
             [[ $CUR = "," ]] && CUR=""
         
         elif [[ $LVAL == @(icmp|all|0) && $PREV = --icmp-type ]]; then
-            WORDS=$(sudo $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+            WORDS=$($SUDO $CMD -p icmp -h | sed -En '/^Valid ICMP Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
         elif [[ $LVAL == @(icmp6|all|0) && $PREV = --icmpv6-type ]]; then
-            WORDS=$(sudo $CMD -p icmpv6 -h | sed -En '/^Valid ICMPv6 Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+            WORDS=$($SUDO $CMD -p icmpv6 -h | sed -En '/^Valid ICMPv6 Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
         
         elif [[ $LVAL == @(mh|all|0) && $PREV = --mh-type ]]; then
-            WORDS=$(sudo $CMD -p mh -h | sed -En '/^Valid MH Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
+            WORDS=$($SUDO $CMD -p mh -h | sed -En '/^Valid MH Types:/I,/\a/{ //d; /^\S/{ s/^(\S+).*/\1/p }}')
 
         elif [[ $LVAL == ipv6header && $LPRE = --header ]]; then
             WORDS="hop hop-by-hop dst route frag auth esp none prot"
@@ -295,7 +295,7 @@ _iptables_target()
             [[ $CHAIN == @(PREROUTING|USER_DEFINED) ]] && WORDS+=" TPROXY" ;;
         security) WORDS+=" CONNSECMARK SECMARK" ;;
     esac
-    WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
+    WORDS+=" "$( $SUDO $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
 }
 _iptables_check() 
 {
@@ -316,7 +316,7 @@ _iptables_check()
 _iptables_number()
 {
     local table=$1 chain=$2
-    WORDS=$( sudo $CMD -t $table -S $chain 2>/dev/null | gawk '{
+    WORDS=$( $SUDO $CMD -t $table -S $chain 2>/dev/null | gawk '{
         if ($1 == "-A") { 
             $1 = $2 = ""; sub(/^ +/,"")
             a[i++] = $0 
@@ -351,7 +351,7 @@ _iptables()
     local CMD=$1 CUR=${COMP_WORDS[COMP_CWORD]}
     [[ ${COMP_LINE:COMP_POINT-1:1} = " " ]] && CUR=""
     local PREV=${COMP_WORDS[COMP_CWORD-1]} PREV2=${COMP_WORDS[COMP_CWORD-2]}
-    local IFS=$' \t\n' WORDS 
+    local IFS=$' \t\n' WORDS SUDO=$( [[ $EUID != 0 ]] && echo sudo )
     [[ $COMP_LINE =~ .*" "(-[[:alpha:]]*t|--table)" "+([[:alnum:]]+) ]]
     local TABLE=${BASH_REMATCH[2]:-filter}
     [[ $COMP_LINE =~ .*" "(-[[:alpha:]]*[AIR]|--append|--insert|--replace)" "+([[:alnum:]]+) ]]
@@ -391,7 +391,7 @@ _iptables()
             esac
         fi
         if [[ $PREV != @(-!(-*)P|--policy) ]]; then
-            WORDS+=" "$( sudo $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
+            WORDS+=" "$( $SUDO $CMD -t $TABLE -S | gawk '{ if ($1 == "-N") print $2 }' )
         fi
 
     elif [[ $PREV == @(-!(-*)[io]|--in-interface|--out-interface|--rateest1|--rateest2|\
